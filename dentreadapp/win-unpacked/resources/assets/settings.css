@@ -1,0 +1,98 @@
+body {
+    background-color: #f8f9fa;
+    font-family: Arial, sans-serif;
+}
+
+body::-webkit-scrollbar {
+    width: 5px;
+}
+
+body::-webkit-scrollbar-thumb {
+    background-color: #c5cbd8;
+    border-radius: 3px;
+}
+
+body::-webkit-scrollbar-thumb:hover {
+    background-color: #c5cbd8;
+}
+
+.custom-file label{
+    overflow: hidden;
+    line-height: 24px;
+}
+
+.addPathBtn{
+    background: #1F3F7F;
+    border-color: #1F3F7F;
+}
+.addPathBtn:hover{
+    background: #1F3F7F;
+    border-color: #1F3F7F;
+}
+
+.selFle{
+    color: black;
+    border: 0.5px solid var(--Brand-Blue, #1F3F7F);
+}
+.selFle:hover {
+    color: black;
+    border: 0.5px solid var(--Brand-Blue, #1F3F7F);
+    background: white;
+}
+
+.selFle:focus-visible {
+    color: black;
+    border: 0.5px solid var(--Brand-Blue, #1F3F7F);
+    background: white;
+}
+.selFle:active {
+    color: black;
+    border: 0.5px solid var(--Brand-Blue, #1F3F7F);
+    background: white;
+}
+
+.custom-input-style:focus-visible{
+    outline: none;
+}
+.custom-input-style:focus{
+    border: var(--bs-border-width) solid var(--bs-border-color);
+    box-shadow: none;
+}
+
+.plusIcon{
+    margin-right: 5px;
+}
+/* Responsive styles for smaller screens */
+@media (max-width: 768px) {
+    .enclosing-card .card-body {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
+.sendIcon{
+    margin-right: 3px;
+}
+
+.mainContainer{
+    display: flex;
+    align-items: flex-end;
+    margin-left: 10px;
+}
+footer{
+    position: fixed;
+    bottom: 0;
+    background-color: #e0e0e0;
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    padding: 8px 15px;
+}
+.custom-margin{
+    margin-right: 5px;
+}
+
+.button-basic, .button-basic:hover, .button-basic:focus-visible{
+    color: black;
+    border: 0.5px solid var(--Brand-Blue, #1F3F7F);
+}

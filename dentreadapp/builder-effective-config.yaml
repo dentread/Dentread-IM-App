@@ -1,0 +1,26 @@
+directories:
+  output: ./dentreadapp
+  buildResources: build
+appId: com.example.myapp
+productName: Dentread IM App
+files:
+  - filter:
+      - '**/*'
+extraResources:
+  - filter:
+      - assets/**
+asar: true
+win:
+  target: nsis
+  icon: images/Favdesktop.png
+mac:
+  target: dmg
+linux:
+  target:
+    - AppImage
+    - deb
+nsis:
+  oneClick: false
+  perMachine: true
+  allowToChangeInstallationDirectory: true
+electronVersion: 27.0.0
