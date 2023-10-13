@@ -1,6 +1,6 @@
 # electron-builder.yml
 
-appId: com.example.myapp
+appId: com.dentread.IM
 productName: Dentread IM App
 directories:
   output: ./dentreadapp

@@ -3,7 +3,9 @@ const path = require('node:path');
 const rimraf = require('rimraf');
 const fs = require('fs');
 const url = require('url');
-const { autoUpdater } = require("electron-updater")
+const { autoUpdater } = require("electron-updater");
+const log = require("electron-log"); // Require the electron-log module.
+
 class AppUpdater {
   constructor() {
     log.transports.file.level = "debug";
@@ -16,9 +18,6 @@ class AppUpdater {
     });
   }
 }
-
-module.exports = AppUpdater;
-
 
 let mainWindow;
 let customDialog;
@@ -122,4 +121,15 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
   }
+});
+autoUpdater.on('update-available', () => {
+  mainWindow.webContents.send('update-available'); // You can trigger a notification in your renderer process here.
+});
+
+autoUpdater.on('update-downloaded', () => {
+  mainWindow.webContents.send('update-downloaded'); // You can trigger a notification in your renderer process here.
+});
+
+autoUpdater.on('error', (error) => {
+  console.error('Auto-updater error:', error);
 });
