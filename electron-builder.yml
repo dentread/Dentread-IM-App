@@ -1,0 +1,24 @@
+# electron-builder.yml
+
+appId: com.example.myapp
+productName: Dentread IM App
+directories:
+  output: ./dentreadapp
+files:
+  - "**/*"
+extraResources:
+  - assets/**
+asar: true
+win:
+  target: nsis
+  icon: "images/Favdesktop.png"
+mac:
+  target: dmg
+linux:
+  target:
+    - AppImage
+    - deb
+nsis:
+  oneClick: false
+  perMachine: true
+  allowToChangeInstallationDirectory: true

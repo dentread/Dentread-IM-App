@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Dentread IM App</title>
+    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../assets/mainpage.css">
+    <link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.css">
+</head>
+<body>
+    <div class="main-content">
+        <div class="container-fluid">
+            <div class="col-sm-12 logout-header">
+                <button class="btn settings-button ml-auto" id="settingsButton"><i class="fa fa-cog" aria-hidden="true"></i> Settings</button>
+                <button class="btn logout-button ml-auto" id="logoutbutton"><i class="fa fa-power-off mr-2" aria-hidden="true"></i> Logout</button>
+            </div>
+            <div class="col-sm-12 col-lg-12 col-xl-12 mb-4">
+                <div class="row row-sm  mt-lg-4">
+                    <div class="col-sm-12 col-lg-12 col-xl-12">
+                        <div class="card enclosing-card card-box">
+                            <div class="card-body p-3">
+                                <img src="../images/dental_clinic_circular.png" alt="clinic">
+                                <div class="greeting-message">
+                                    <span>Welcome, </span>
+                                    <h5 class="user-name"></h5>
+                                    <span class="centre-name"></span>
+                                </div>
+
+                                <div class="other-info">
+                                    <div class="">
+                                        <span class="important-text">0</span>
+                                        <span>Synced Folders</span>
+                                    </div>
+                                    <!-- <div class="">
+                                        <span class="important-text">0</span>
+                                        <span>Non-synced Folders</span>
+                                    </div> -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="syncing-workflow" id="stgToSync">
+                <div class="container-fluid">
+                    <div class="row">
+                      <div class="col-sm-6 mt-3">
+                        <div class="staged">
+                            <div class="heading-part">
+                                <h6>Files Ready To Be Synced</h6>
+                                <button type="button" class="btn button-basic-without-border" id="stageToSync"><i class="fa fa-refresh custom-margin" aria-hidden="true"></i></button>
+                            </div>
+                            <div class="container text-area custom-scrollbar mt-2" id="allStagedFiles">
+                                <!-- Content for 'Staged To Sync' goes here -->
+                            </div>
+                        </div>
+                      </div>
+                      <div class="col-sm-6 mt-3" id="stgToSyncdentread">
+                        <div class="dentreadstage">
+                            <div class="heading-part extra-padding">
+                                <h6>Syncing To Dentread</h6>
+                                <button type="button" class="d-none" disabled="true"><i class="fa fa-refresh custom-margin" aria-hidden="true"></i>Ok</button>
+                            </div>
+                            <div class="container text-area custom-scrollbar mt-2" id="allStagedFilesdentread">
+                                <!-- Content for 'Dentread Stage' goes here -->
+                            </div>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+                <div class="dentreadSyncing container mt-6 d-flex justify-content-center align-items-center">
+                    <button class="syncToDentread" id="syncToDentreadId">Sync To Dentread</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../contents/mainpage.js"></script>
+    <script src="../node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../contents/fileSelector.js"></script>
+</body>  
+</html>
