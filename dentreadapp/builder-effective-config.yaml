@@ -1,7 +1,7 @@
 directories:
   output: ./dentreadapp
   buildResources: build
-appId: com.example.myapp
+appId: com.dentread.IM
 productName: Dentread IM App
 files:
   - filter:
