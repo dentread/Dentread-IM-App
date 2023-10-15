@@ -62,7 +62,7 @@ function createWindow() {
 
   mainWindow.loadFile('contents/login_dentread.html');
   // autoUpdater.checkForUpdatesAndNotify();
-  // mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
 }
 
 app.whenReady().then(() => {
