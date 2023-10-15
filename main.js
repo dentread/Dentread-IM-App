@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu, ipcMain } = require('electron');
+const { app, BrowserWindow, Menu, ipcMain,dialog } = require('electron');
 const path = require('node:path');
 const rimraf = require('rimraf');
 const fs = require('fs');
