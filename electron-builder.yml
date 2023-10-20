@@ -1,9 +1,8 @@
 # electron-builder.yml
-
-appId: com.example.myapp
-productName: Dentread IM App
+appId: com.dentread.myapp
+productName: DentreadIMApp_11
 directories:
-  output: ./dentread
+  output: ./DentreadBuild11
 files:
   - "**/*"
 extraResources:
@@ -13,6 +12,7 @@ win:
   target: nsis
   icon: "images/Favdesktop.png"
   publisherName: "Dentread"
+  artifactName: "${productName}-Setup-${version}.${ext}"
 mac:
   target: dmg
 linux:

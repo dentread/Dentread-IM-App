@@ -50,16 +50,13 @@ function storeThePath(localPath) {
         document.getElementById('syncedPathThree').value = localPath;
         document.getElementById('editThePath3').disabled = false;
       }
-  
-      // Clear the visibleDir input field
+
       document.getElementById('visibleDir').value = null;
   
-      // Disable the addPathBtn after selecting a path
       document.getElementById('filepicker_add').disabled = true;
     }
   }
 
-// Get the "Add Path" button element
 const addPathBtn = document.getElementById('filepicker_add');
 
 const visibleDirInput = document.getElementById('visibleDir');
@@ -74,7 +71,6 @@ function enbFunc(){
 };
 
 
-// Add an event listener to the "visibleDir" input
 visibleDirInput.addEventListener('input', enbFunc)
 
 let fileStorePath = 'emptyFile';
@@ -120,7 +116,7 @@ editPathBtn2.addEventListener('click', () => {
     if (syncedPathTwoValue) {
         localStorage.removeItem('firstSelectedPath2');
         document.getElementById('syncedPathTwo').value = null;
-        editPathBtn2.disabled = true; // Use editPathBtn2 here
+        editPathBtn2.disabled = true;
     }
 });
 
@@ -130,6 +126,6 @@ editPathBtn3.addEventListener('click', () => {
     if (syncedPathThreeValue) {
         localStorage.removeItem('firstSelectedPath3');
         document.getElementById('syncedPathThree').value = null;
-        editPathBtn3.disabled = true; // Use editPathBtn3 here
+        editPathBtn3.disabled = true;
     }
 });

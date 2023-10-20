@@ -5,13 +5,14 @@ const FormData = require('form-data');
 const axios = require('axios');
 const archiver = require('archiver');
 const rimraf = require('rimraf');
-
+const fetch = require('node-fetch');
 
 
 const sendFileToAPI = async (filePath, apiUrl, accessToken, username) => {
   const folderName_withzip = path.basename(filePath);
   const folderName = path.parse(filePath).name;
   const fileStream = fs.createReadStream(filePath);
+
 
   const formData = new FormData();
   formData.append('directory_path', folderName);
@@ -20,55 +21,41 @@ const sendFileToAPI = async (filePath, apiUrl, accessToken, username) => {
     filename: folderName_withzip,
   });
 
-  const axiosInstance = axios.create({
-    baseURL: apiUrl,
+  console.log('Request URL:', apiUrl); // Add this line to log the request URL
+  console.log('Form Data Fields:', formData); // Add this line to log the form data
+
+  const response = await fetch(apiUrl, {
+    method: 'POST',
     headers: {
       'Authorization': `Bearer ${accessToken}`,
-      ...formData.getHeaders(),
+      ...formData.getHeaders()
     },
+    body: formData,
   });
-  try {
-    const response = await axiosInstance.post('/', formData);
-    console.log('API Response for', folderName_withzip, ':', response.data, response.status);
-    
-    // Return the response object directly
+
+  console.log('Response Status:', response.status); // Add this line to log the response status
+
+  if (response.ok) {
+    const responseData = await response.text();
+    console.log('API Response:', responseData, response.status);
     return response;
-  } catch (error) {
-    console.error('API Error:', error);
-    // If there's an error, you can throw it so it's caught in the calling function
-    throw error;
+  } else {
+    console.error('API Error:', response.statusText);
+    const errorResponse = await response.text();
+    console.error('API Error Response:', errorResponse);
+    throw new Error(`API Error: ${response.statusText}`);
   }
 };
 
-// const collectFilesFromDirectory = async (directoryPath) => {
-//   const files = [];
 
-//   const collectFiles = async (dir) => {
-//     const items = await fs.promises.readdir(dir);
-
-//     for (const item of items) {
-//       const itemPath = path.join(dir, item);
-//       const stats = await fs.promises.stat(itemPath);
-
-//       if (stats.isDirectory()) {
-//         await collectFiles(itemPath);
-//       } else {
-//         files.push(itemPath);
-//       }
-//     }
-//   };
-
-//   await collectFiles(directoryPath);
-//   return files;
-// };
 
 const createZipFromDirectory = async (directoryPath) => {
   return new Promise(async (resolve, reject) => {
-    const zipFilePath = `${directoryPath}.zip`; // Create a zip file in the same directory
+    const zipFilePath = `${directoryPath}.zip`; 
 
     const output = fs.createWriteStream(zipFilePath);
     const archive = archiver('zip', {
-      zlib: { level: 9 }, // Set compression level (maximum)
+      zlib: { level: 9 }, 
     });
 
     output.on('close', async () => {
@@ -82,8 +69,7 @@ const createZipFromDirectory = async (directoryPath) => {
 
     archive.pipe(output);
 
-    // Add all files and subdirectories to the zip archive
-    archive.directory(directoryPath, false); // The 'false' parameter ensures that the directory structure is not included
+    archive.directory(directoryPath, false); 
 
     archive.finalize();
   });
@@ -103,7 +89,6 @@ contextBridge.exposeInMainWorld('versions', {
 
       console.log(directoryPath)
 
-      // Create the directory if it doesn't exist
       if (!fs.existsSync(directoryPath)) {
         fs.mkdirSync(directoryPath, { recursive: true });
         localStorage.setItem('dentread_dir', directoryPath);
@@ -122,7 +107,7 @@ contextBridge.exposeInMainWorld('versions', {
       const directoryPath = path.join(projectPath, 'Dentread');
   
       if (fs.existsSync(directoryPath)) {
-        rimraf.sync(directoryPath); // Synchronously delete the directory and its contents
+        rimraf.sync(directoryPath);
         console.log(`Directory deleted: ${directoryPath}`);
         return { success: true, message: `Directory deleted: ${directoryPath}` };
       } else {
@@ -144,29 +129,23 @@ contextBridge.exposeInMainWorld('versions', {
   
       if (fs.existsSync(targetPath)) {
         if (fs.lstatSync(targetPath).isDirectory()) {
-          // If it's a directory, get a list of its contents
           const directoryContents = fs.readdirSync(targetPath);
   
-          // Iterate through the contents and remove each one
           for (const item of directoryContents) {
             const itemPath = path.join(targetPath, item);
   
             if (fs.lstatSync(itemPath).isDirectory()) {
-              // If it's a subdirectory, recursively delete it
               rimraf.sync(itemPath);
             } else {
-              // If it's a file, unlink it (remove it)
               fs.unlinkSync(itemPath);
             }
           }
           
-          // After emptying the directory, remove the empty directory itself
           fs.rmdirSync(targetPath);
           
           console.log(`Directory emptied: ${targetPath}`);
           return { success: true, message: `Directory emptied: ${targetPath}` };
         } else if (fs.lstatSync(targetPath).isFile()) {
-          // If it's a file, simply unlink it (remove it)
           fs.unlinkSync(targetPath);
           
           console.log(`File removed: ${targetPath}`);
@@ -199,20 +178,16 @@ contextBridge.exposeInMainWorld('versions', {
             const destinationItemPath = path.join(destinationDirectory, item);
 
             if (fs.statSync(sourceItemPath).isDirectory()) {
-                // Check if the folder name is in the set
                 const folderNamesSet = new Set(JSON.parse(localStorage.getItem('folderNames')));
                 if (!folderNamesSet.has(item)) {
-                    // Folder is not in the set, so copy it
                     fs.mkdirSync(destinationItemPath, { recursive: true });
                     namedFunction(sourceItemPath, destinationItemPath, fileExtensions);
                 }
             } else {
                 const fileExtension = path.extname(item).toLowerCase();
                 if (fileExtensions.includes(fileExtension)) {
-                    // Check if the filename is in the set
                     const filenameSet = new Set(JSON.parse(localStorage.getItem('filenames')));
                     if (!filenameSet.has(item)) {
-                        // File is not in the set, so copy it
                         fs.copyFileSync(sourceItemPath, destinationItemPath);
                     }
                 }
@@ -227,7 +202,6 @@ contextBridge.exposeInMainWorld('versions', {
     }
 },
 
-    // Function to list files and folders in a directory
   listFilesAndFolders: async (directoryPath)=> {
     try {
       const items = fs.readdirSync(directoryPath);
@@ -250,26 +224,22 @@ contextBridge.exposeInMainWorld('versions', {
   
       const newDirectoryPath = currentWorkingDirectory + '\\' + 'Dentread' + '\\' + savedUsername + '\\' + reqdId;
       console.log('newDirectoryPath:', newDirectoryPath);
-      const apiUrl = 'http://testapi.dentread.com/datasync'; // Replace with your API URL
+      const apiUrl = 'http://testapi.dentread.com/datasync/';
       const token = JSON.parse(localStorage.getItem('token'));
       const accessToken = token.access;
       const username = localStorage.getItem('savedUsername');
   
-      // Check if folderPath is a directory
       const isDirectory = fs.statSync(newDirectoryPath).isDirectory();
   
       let zipFilePath = '';
   
       if (isDirectory) {
-        // If it's a directory, create a zip archive from its contents
         zipFilePath = await createZipFromDirectory(newDirectoryPath);
   
-        // Send the zip file to the API and store the response
         const response = await sendFileToAPI(zipFilePath, apiUrl, accessToken, username);
   
         console.log('API Request Completed',response);
   
-        // After the API request is completed, delete the zip file
         if (zipFilePath) {
           try {
             await fs.promises.unlink(zipFilePath);
@@ -279,28 +249,25 @@ contextBridge.exposeInMainWorld('versions', {
           }
         }
   
-        // Return the response data if it exists
         if (response) {
           return response;
         } else {
-          return { message: 'API request failed', status: 500 }; // Default status code
+          return { message: 'API request failed', status: 500 }; 
         }
       } else {
-        // If it's a zip file, send it as is and store the response
         const response = await sendFileToAPI(newDirectoryPath, apiUrl, accessToken, username);
   
         console.log('API Request Completed', response);
   
-        // Return the response data if it exists
         if (response) {
           return response;
         } else {
-          return { message: 'API request failed', status: 500 }; // Default status code
+          return { message: 'API request failed', status: 500 }; 
         }
       }
     } catch (error) {
       console.error('API Error:', error);
-      return { message: 'API request failed', status: 500 }; // Default status code
+      return { message: 'API request failed', status: 500 }; 
     }
   },
   settingsbuttonfunc: async () => {

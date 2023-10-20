@@ -31,7 +31,6 @@ const loginForm = document.getElementById('login-form');
 const usernameInput = document.getElementById('username');
 const passwordInput = document.getElementById('password');
 
-// Check if "Remember Me" is checked in localStorage and set the checkbox state accordingly
 if (localStorage.getItem('rememberMe') === 'true') {
     rememberMeCheckbox.checked = true;
     usernameInput.value = localStorage.getItem('savedUsername');
@@ -39,11 +38,11 @@ if (localStorage.getItem('rememberMe') === 'true') {
 }
 
 loginForm.addEventListener('submit', async (event) => {
-    event.preventDefault(); // Prevent the form from submitting normally
+    event.preventDefault(); 
 
     const username = usernameInput.value;
     const password = passwordInput.value;
-    const rememberMe = rememberMeCheckbox.checked; // Get the "Remember Me" checkbox state
+    const rememberMe = rememberMeCheckbox.checked; 
 
     const xhr = new XMLHttpRequest();
     xhr.open('POST', 'http://testapi.dentread.com/authenticate_desktop/');
@@ -61,12 +60,10 @@ loginForm.addEventListener('submit', async (event) => {
                     const response = await window.versions.createDirectory(username);
                     console.log(response);
                     if (response.success) {
-                        const dentread_dir = response.directoryPath; // Assuming the response.message contains the dentread_dir path
-    
-                        // Store dentread_dir in local storage
+                        const dentread_dir = response.directoryPath; 
                         
     
-                        return dentread_dir; // Return dentread_dir for further use if needed
+                        return dentread_dir; 
                     } else {
                         console.error('Directory creation failed:', response.message);
                         return null;
@@ -75,12 +72,10 @@ loginForm.addEventListener('submit', async (event) => {
     
                 const dentread_dir = func();
 
-                // Store the token in localStorage
                 localStorage.setItem('token', JSON.stringify(token));
                 localStorage.setItem('user_name', user_name)
                 localStorage.setItem('orgname', orgname)
 
-                // Store "Remember Me" preference
                 if (rememberMe) {
                     localStorage.setItem('rememberMe', true);
                     localStorage.setItem('savedUsername', username);
@@ -91,7 +86,6 @@ loginForm.addEventListener('submit', async (event) => {
                     localStorage.removeItem('savedPassword');
                 }
 
-                // Redirect to the next page
                 window.location.href = 'mainpage.html';
             } else {
                 doSomething('Authentication failed');

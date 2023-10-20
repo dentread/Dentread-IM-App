@@ -1,14 +1,13 @@
-const { app, BrowserWindow, Menu, ipcMain,dialog } = require('electron');
+const { app, BrowserWindow, Menu, ipcMain, dialog } = require('electron');
 const path = require('node:path');
 const rimraf = require('rimraf');
 const fs = require('fs');
 const url = require('url');
 const { autoUpdater } = require("electron-updater")
-// Set the path to your update configuration file
+
 autoUpdater.autoDownload = false;
 autoUpdater.updateConfigPath = path.join(__dirname, 'update.yml');
 
-// Listen for update availability
 autoUpdater.on('update-available', () => {
   dialog.showMessageBox({
     type: 'info',
@@ -22,27 +21,9 @@ autoUpdater.on('update-available', () => {
   });
 });
 
-// Listen for updates when ready
 app.on('ready', () => {
   autoUpdater.checkForUpdates();
 });
-
-
-// class AppUpdater {
-//   constructor() {
-//     log.transports.file.level = "debug";
-//     autoUpdater.logger = log;
-//     autoUpdater.checkForUpdatesAndNotify();
-//     autoUpdater.setFeedURL({
-//       provider: 'github',
-//       owner: 'dentreadbhavik',
-//       repo: 'Dentread-IM-App',
-//     });
-//   }
-// }
-
-// module.exports = AppUpdater;
-
 
 let mainWindow;
 let customDialog;
@@ -56,13 +37,11 @@ function createWindow() {
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: true,
-      
     },
   });
 
   mainWindow.loadFile('contents/login_dentread.html');
-  // autoUpdater.checkForUpdatesAndNotify();
-  // mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
 }
 
 app.whenReady().then(() => {
@@ -105,7 +84,6 @@ function createCustomDialog() {
     icon: path.join(__dirname, 'images/MySettings.png'),
     title: 'Settings',
   });
-  // customDialog.webContents.openDevTools();
 
   customDialog.loadURL(url.format({
     pathname: path.join(__dirname, 'contents/settings.html'),
