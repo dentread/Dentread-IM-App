@@ -28,7 +28,7 @@ const func2 = async () => {
     const targetedDir_dentread2 = JSON.parse(localStorage.getItem('firstSelectedPath2'));
     const targetedDir_dentread3 = JSON.parse(localStorage.getItem('firstSelectedPath3'));
     const dentread_dir = localStorage.getItem('dentread_dir');
-    const fileExtension = ['.stl', '.obj', '.ply', '.fbx', '.dae', '.3ds', '.blend', '.dxf', '.step', '.stp', '.igs', '.iges', '.x3d', '.vrml', '.amf', '.gltf', '.glb', '.usdz', '.3mf', '.wrl', '.xml', '.dcm', '.zip'];
+    const fileExtension = ['.stl', '.obj', '.ply', '.fbx', '.dae', '.3ds', '.blend', '.dxf', '.step', '.stp', '.igs', '.iges', '.x3d', '.vrml', '.amf', '.gltf', '.glb', '.usdz', '.3mf', '.wrl', '.xml', '.dcm', '.zip','.png','.jpg','.pdf','.jpeg'];
 
     const isFolderInLocalStorage = (folderName) => {
         return existingFolders.includes(folderName);
