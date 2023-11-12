@@ -5,23 +5,46 @@ const fs = require('fs');
 const url = require('url');
 const { autoUpdater } = require("electron-updater")
 
-autoUpdater.autoDownload = false;
 
-autoUpdater.on('update-available', () => {
-  dialog.showMessageBox({
-    type: 'info',
-    title: 'Update Available',
-    message: 'A new version is available. Do you want to update now?',
-    buttons: ['Yes', 'No'],
-  }).then((result) => {
-    if (result.response === 0) {
-      autoUpdater.downloadUpdate();
-    }
-  });
-});
 
 app.on('ready', () => {
   autoUpdater.checkForUpdates();
+  autoUpdater.autoDownload = false;
+
+  autoUpdater.on('update-available', () => {
+    dialog.showMessageBox({
+      type: 'info',
+      title: 'Update Available',
+      message: 'A new version is available. Do you want to update now?',
+      buttons: ['Yes', 'No'],
+    }).then((result) => {
+      if (result.response === 0) {
+        autoUpdater.downloadUpdate();
+      }
+    });
+  });
+
+  autoUpdater.on('checking-for-update', () => {
+    console.log('Checking for update...');
+  });
+  
+  autoUpdater.on('update-not-available', () => {
+    console.log('Update not available.');
+  });
+  
+  autoUpdater.on('error', (err) => {
+    console.error('Error in auto-updater:', err);
+  });
+  
+  autoUpdater.on('download-progress', (progressObj) => {
+    console.log(`Download speed: ${progressObj.bytesPerSecond}`);
+    console.log(`Downloaded ${progressObj.percent}%`);
+  });
+  
+  autoUpdater.on('update-downloaded', () => {
+    console.log('Update downloaded.');
+  });
+  
 });
 
 let mainWindow;
@@ -40,7 +63,9 @@ function createWindow() {
   });
 
   mainWindow.loadFile('contents/login_dentread.html');
-  autoUpdater.checkForUpdatesAndNotify();
+  mainWindow.once('ready-to-show', () => {
+    autoUpdater.checkForUpdatesAndNotify();
+  });
   // mainWindow.webContents.openDevTools();
 }
 
