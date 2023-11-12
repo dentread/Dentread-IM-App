@@ -1,5 +1,5 @@
 # electron-builder.yml
-appId: com.dentread.myapp
+appId: com.dentread.Imapp
 productName: DentreadIMApp11
 directories:
   output: ./DentreadBuild11

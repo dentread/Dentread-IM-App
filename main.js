@@ -6,7 +6,6 @@ const url = require('url');
 const { autoUpdater } = require("electron-updater")
 
 autoUpdater.autoDownload = false;
-autoUpdater.updateConfigPath = path.join(__dirname, 'update.yml');
 
 autoUpdater.on('update-available', () => {
   dialog.showMessageBox({
@@ -42,7 +41,7 @@ function createWindow() {
 
   mainWindow.loadFile('contents/login_dentread.html');
   // autoUpdater.checkForUpdatesAndNotify();
-  mainWindow.webContents.openDevTools();
+  // mainWindow.webContents.openDevTools();
 }
 
 app.whenReady().then(() => {
