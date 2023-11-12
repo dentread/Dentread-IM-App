@@ -40,7 +40,7 @@ function createWindow() {
   });
 
   mainWindow.loadFile('contents/login_dentread.html');
-  // autoUpdater.checkForUpdatesAndNotify();
+  autoUpdater.checkForUpdatesAndNotify();
   // mainWindow.webContents.openDevTools();
 }
 
