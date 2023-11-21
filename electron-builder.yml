@@ -8,6 +8,10 @@ files:
 extraResources:
   - assets/**
 asar: true
+publish:
+  provider: github
+  owner: dentreadbhavik
+  repo: Dentread-IM-App
 win:
   target: nsis
   icon: "images/Favdesktop.png"
