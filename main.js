@@ -3,15 +3,21 @@ const path = require('node:path');
 const rimraf = require('rimraf');
 const fs = require('fs');
 const url = require('url');
-const { autoUpdater } = require("electron-updater")
+const { autoUpdater } = require("electron-updater");
 
-
+// Squirrel.Windows events
+if (require('electron-squirrel-startup')) {
+  app.quit();
+}
 
 app.on('ready', () => {
+  // Check for updates
   autoUpdater.checkForUpdates();
+
   autoUpdater.autoDownload = false;
 
   autoUpdater.on('update-available', () => {
+    // Show update prompt
     dialog.showMessageBox({
       type: 'info',
       title: 'Update Available',
@@ -19,6 +25,7 @@ app.on('ready', () => {
       buttons: ['Yes', 'No'],
     }).then((result) => {
       if (result.response === 0) {
+        // Download the update
         autoUpdater.downloadUpdate();
       }
     });
@@ -42,9 +49,9 @@ app.on('ready', () => {
   });
   
   autoUpdater.on('update-downloaded', () => {
-    console.log('Update downloaded.');
+    // Notify that update is downloaded
+    console.log('Update downloaded. Ready to install.');
   });
-  
 });
 
 let mainWindow;
@@ -64,6 +71,7 @@ function createWindow() {
 
   mainWindow.loadFile('contents/login_dentread.html');
   mainWindow.once('ready-to-show', () => {
+    // Check for updates and notify
     autoUpdater.checkForUpdatesAndNotify();
   });
   mainWindow.webContents.openDevTools();

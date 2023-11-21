@@ -1,4 +1,3 @@
-# electron-builder.yml
 appId: com.dentread.Imapp
 productName: DentreadIMApp11
 directories:
@@ -17,6 +16,8 @@ win:
   icon: "images/Favdesktop.png"
   publisherName: "Dentread"
   artifactName: "${productName}-Setup-${version}.${ext}"
+  squirrelWindows:
+    remoteReleases: https://github.com/dentreadbhavik/Dentread-IM-App # Replace with your GitHub repository URL
 mac:
   target: dmg
 linux:

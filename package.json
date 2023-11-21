@@ -1,27 +1,27 @@
 {
   "name": "DentreadIMApp",
-  "version": "1.1.4",
+  "version": "1.1.1",
   "description": "Dentread IM App",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
     "package": "electron-builder"
   },
-  "repository":"https://github.com/dentreadbhavik/Dentread-IM-App",
+  "repository": "https://github.com/dentreadbhavik/Dentread-IM-App",
   "publish": {
     "provider": "github",
-    "releaseType":"release"
+    "releaseType": "release"
   },
   "build": {
     "appId": "com.dentread.Imapp",
     "win": {
-      "target":"nsis"
+      "target": "nsis"
     },
     "directories": {
       "output": "DentreadBuild11"
     },
-  "artifactName": "${productName}-Setup.${ext}",
-  "icon": "images/Favdesktop.png"
+    "artifactName": "${productName}-Setup.${ext}",
+    "icon": "images/Favdesktop.png"
   },
   "productName": "DentreadIMApp",
   "author": "Dentread",
@@ -32,6 +32,7 @@
     "axios": "^1.5.0",
     "bootstrap": "^5.3.2",
     "dialog": "^0.3.1",
+    "electron-squirrel-startup": "^1.0.0",
     "electron-updater": "^6.1.4",
     "form-data": "^4.0.0",
     "got": "^13.0.0",
