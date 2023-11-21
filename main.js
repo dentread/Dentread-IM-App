@@ -5,54 +5,42 @@ const fs = require('fs');
 const url = require('url');
 const { autoUpdater } = require("electron-updater");
 
-// Squirrel.Windows events
-if (require('electron-squirrel-startup')) {
-  app.quit();
-}
 
 app.on('ready', () => {
-  // Check for updates
   autoUpdater.checkForUpdates();
 
   autoUpdater.autoDownload = false;
 
   autoUpdater.on('update-available', () => {
-    // Show update prompt
-    dialog.showMessageBox({
-      type: 'info',
-      title: 'Update Available',
-      message: 'A new version is available. Do you want to update now?',
-      buttons: ['Yes', 'No'],
-    }).then((result) => {
-      if (result.response === 0) {
-        // Download the update
-        autoUpdater.downloadUpdate();
-      }
+    // Perform silent update without showing a dialog
+    autoUpdater.downloadUpdate();
+
+    // Optional: Listen to the 'update-downloaded' event to handle further actions
+    autoUpdater.on('update-downloaded', () => {
+      console.log('Update downloaded. Ready to install.');
+      // Quit and install the update
+      autoUpdater.quitAndInstall();
     });
   });
 
   autoUpdater.on('checking-for-update', () => {
     console.log('Checking for update...');
   });
-  
+
   autoUpdater.on('update-not-available', () => {
     console.log('Update not available.');
   });
-  
+
   autoUpdater.on('error', (err) => {
     console.error('Error in auto-updater:', err);
   });
-  
+
   autoUpdater.on('download-progress', (progressObj) => {
     console.log(`Download speed: ${progressObj.bytesPerSecond}`);
     console.log(`Downloaded ${progressObj.percent}%`);
   });
-  
-  autoUpdater.on('update-downloaded', () => {
-    // Notify that update is downloaded
-    console.log('Update downloaded. Ready to install.');
-  });
 });
+
 
 let mainWindow;
 let customDialog;
