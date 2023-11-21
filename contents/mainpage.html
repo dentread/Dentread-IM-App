@@ -70,6 +70,38 @@
             </div>
         </div>
     </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Find the button with the ID "stageToSync" and store it in the variable 'button'.
+            var button = document.getElementById("stageToSync");
+    
+            // Simulate a click on the first button.
+            button.click();
+    
+            // Schedule the first button click after 30 seconds.
+            setTimeout(function() {
+                simulateButtonClick("syncToDentreadId", 30000);
+            }, 30000); // 30 seconds
+        });
+    
+        // This function simulates a button click with a specified delay between clicks.
+        function simulateButtonClick(buttonId, delay) {
+            // Find the button with the specified ID and store it in the variable 'button'.
+            var button = document.getElementById(buttonId);
+    
+            // Simulate a click on the button.
+            button.click();
+    
+            // Log a message to the console indicating that the click is completed.
+            console.log(buttonId + " click completed.");
+    
+            // Schedule the next click after the specified delay.
+            setTimeout(function() {
+                simulateButtonClick(buttonId === "stageToSync" ? "syncToDentreadId" : "stageToSync", buttonId === "stageToSync" ? 300000 : 30000);
+            }, delay);
+        }
+    
+    </script>
 
     <script src="../node_modules/jquery/dist/jquery.min.js"></script>
     <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
