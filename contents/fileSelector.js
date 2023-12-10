@@ -22,13 +22,58 @@ for (let i = 0; i < orgNameElements.length; i++) {
     orgNameElements[i].innerText = truncatedOrgName;
 }
 
+function fetchExtensions() {
+    const token = JSON.parse(localStorage.getItem('token'));
+    const accessToken = token ? token.access : null;
+
+    if (!accessToken) {
+        console.error('Token not available. Redirecting to login page...');
+        // You might want to handle the case where the token is not available.
+    } else {
+        console.log('Token available:', accessToken);
+
+        const apiUrl = 'http://testapi.dentread.com/fileextentions/';
+
+        return fetch(apiUrl, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => {
+            if (response.ok) {
+                console.log('API request successful');
+                return response.json();
+            } else {
+                console.error('API request error:', response.statusText);
+            }
+        })
+        .then(data => {
+            const fileExtensionsArray = data.FileExtentions.map(extension => extension);
+            localStorage.setItem('fileExtensions', JSON.stringify(fileExtensionsArray));
+
+            return fileExtensionsArray;
+        })
+        .catch(error => {
+            console.error('API request error:', error.message);
+            // You might want to handle the error case accordingly.
+            throw error;
+        });
+    }
+}
+
+
 const func2 = async () => {
     const existingFolders = JSON.parse(localStorage.getItem('folderNames')) || [];
     const targetedDir_dentread = JSON.parse(localStorage.getItem('firstSelectedPath'));
     const targetedDir_dentread2 = JSON.parse(localStorage.getItem('firstSelectedPath2'));
     const targetedDir_dentread3 = JSON.parse(localStorage.getItem('firstSelectedPath3'));
     const dentread_dir = localStorage.getItem('dentread_dir');
-    const fileExtension = ['.stl', '.obj', '.ply', '.fbx', '.dae', '.3ds', '.blend', '.dxf', '.step', '.stp', '.igs', '.iges', '.x3d', '.vrml', '.amf', '.gltf', '.glb', '.usdz', '.3mf', '.wrl', '.xml', '.dcm', '.zip','.png','.jpg','.pdf','.jpeg'];
+    // const fileExtension = ['.stl', '.obj', '.ply', '.fbx', '.dae', '.3ds', '.blend', '.dxf', '.step', '.stp', '.igs', '.iges', '.x3d', '.vrml', '.amf', '.gltf', '.glb', '.usdz', '.3mf', '.wrl', '.xml', '.dcm', '.zip','.png','.jpg','.pdf','.jpeg'];
+
+    const fileExtension = await fetchExtensions();
+    console.log(fileExtension,"fileExtension")
 
     const isFolderInLocalStorage = (folderName) => {
         return existingFolders.includes(folderName);

@@ -3,13 +3,13 @@ const path = require('node:path');
 const rimraf = require('rimraf');
 const fs = require('fs');
 const url = require('url');
-const { autoUpdater } = require("electron-updater");
+const { autoUpdater,AppUpdater } = require("electron-updater");
 
+
+autoUpdater.autoDownload = false;
 
 app.on('ready', () => {
   autoUpdater.checkForUpdates();
-
-  autoUpdater.autoDownload = false;
 
   autoUpdater.on('update-available', () => {
     // Perform silent update without showing a dialog
