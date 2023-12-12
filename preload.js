@@ -224,7 +224,7 @@ contextBridge.exposeInMainWorld('versions', {
   
       const newDirectoryPath = currentWorkingDirectory + '\\' + 'Dentread' + '\\' + savedUsername + '\\' + reqdId;
       console.log('newDirectoryPath:', newDirectoryPath);
-      const apiUrl = 'http://testapi.dentread.com/datasync/';
+      const apiUrl = 'https://api.dentread.com/datasync/';
       const token = JSON.parse(localStorage.getItem('token'));
       const accessToken = token.access;
       const username = localStorage.getItem('savedUsername');

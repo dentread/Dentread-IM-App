@@ -32,7 +32,7 @@ function fetchExtensions() {
     } else {
         console.log('Token available:', accessToken);
 
-        const apiUrl = 'http://testapi.dentread.com/fileextentions/';
+        const apiUrl = 'https://api.dentread.com/fileextentions/';
 
         return fetch(apiUrl, {
             method: 'GET',
@@ -321,7 +321,7 @@ function fetchData() {
     } else {
         console.log('Token available:', acces_token);
 
-        const apiUrl = 'http://testapi.dentread.com/user-folders/';
+        const apiUrl = 'https://api.dentread.com/user-folders/';
 
         fetch(apiUrl, {
             method: 'GET',

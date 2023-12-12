@@ -11,7 +11,7 @@ function fetchData() {
     } else {
         console.log('Token available:', acces_token);
 
-        const apiUrl = 'http://testapi.dentread.com/user-folders/';
+        const apiUrl = 'https://api.dentread.com/user-folders/';
 
         fetch(apiUrl, {
             method: 'GET',
