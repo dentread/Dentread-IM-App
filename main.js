@@ -49,7 +49,7 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
-    icon: path.join(__dirname, 'images/Fav.png'),
+    icon: path.join(__dirname, 'images/LogoDentread.png'),
     title: 'Dentread',
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),

@@ -1,6 +1,6 @@
 {
   "name": "DentreadIMApp",
-  "version": "1.1.6",
+  "version": "1.1.8",
   "description": "Dentread IM App",
   "main": "main.js",
   "scripts": {
@@ -21,7 +21,7 @@
       "output": "DentreadBuild11"
     },
     "artifactName": "${productName}-Setup.${ext}",
-    "icon": "images/Favdesktop.png"
+    "icon": "images/LogoDentread.png"
   },
   "productName": "DentreadIMApp",
   "author": "Dentread",

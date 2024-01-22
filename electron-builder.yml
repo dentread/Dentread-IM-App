@@ -13,7 +13,7 @@ publish:
   repo: Dentread-IM-App
 win:
   target: nsis
-  icon: "images/Favdesktop.png"
+  icon: "images/LogoDentread.png"
   publisherName: "Dentread"
   artifactName: "${productName}-Setup-${version}.${ext}"
   squirrelWindows:
