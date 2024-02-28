@@ -76,24 +76,29 @@ visibleDirInput.addEventListener('input', enbFunc)
 let fileStorePath = 'emptyFile';
 
 document.getElementById("filepicker").addEventListener("change", (event) => {
-        const selectedDirectory = event.target.files[0];
-        const allFiles = event.target.files
+  const selectedDirectory = event.target.files[0];
+  const allFiles = event.target.files;
 
-        if (selectedDirectory) {
-            let directoryPath = selectedDirectory.path;
-            directoryPath = directoryPath.substring(0, directoryPath.lastIndexOf('\\'));
-            document.getElementById('visibleDir').value = directoryPath;
+  if (selectedDirectory) {
+      let directoryPath = selectedDirectory.path;
+      let directoryPath2 = selectedDirectory.webkitRelativePath;
 
-            if (directoryPath) {
-                fileStorePath = directoryPath;
-                enbFunc()
-            }
-        } else {
-            console.log('No directory selected.');
-        }
-    },
-    false
-);
+      // Find the root directory from directoryPath2
+      const rootDirectory = directoryPath2.split('/')[0];
+
+      // Change directoryPath up to the root directory
+      directoryPath = directoryPath.substring(0, directoryPath.indexOf(rootDirectory) + rootDirectory.length);
+
+      document.getElementById('visibleDir').value = directoryPath;
+
+      if (directoryPath) {
+          fileStorePath = directoryPath;
+          enbFunc();
+      }
+  } else {
+      console.log('No directory selected.');
+  }
+}, false);
 
 
 document.getElementById('filepicker_add').addEventListener('click', () => {
