@@ -55,10 +55,8 @@ loginForm.addEventListener('submit', async (event) => {
                 const token = xhr.response.token;
                 const user_name = xhr.response.name;
                 const orgname = xhr.response.orgname;
-                console.log('user_name', user_name, 'orgname', orgname);
                 const func = async () => {
                     const response = await window.versions.createDirectory(username);
-                    console.log(response);
                     if (response.success) {
                         const dentread_dir = response.directoryPath; 
                         

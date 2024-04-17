@@ -7,7 +7,6 @@ const archiver = require('archiver');
 const rimraf = require('rimraf');
 const fetch = require('node-fetch');
 
-
 const sendFileToAPI = async (filePath, apiUrl, accessToken, username) => {
   const folderName_withzip = path.basename(filePath);
   const folderName = path.parse(filePath).name;
@@ -21,8 +20,7 @@ const sendFileToAPI = async (filePath, apiUrl, accessToken, username) => {
     filename: folderName_withzip,
   });
 
-  console.log('Request URL:', apiUrl); // Add this line to log the request URL
-  console.log('Form Data Fields:', formData); // Add this line to log the form data
+
 
   const response = await fetch(apiUrl, {
     method: 'POST',
@@ -33,20 +31,16 @@ const sendFileToAPI = async (filePath, apiUrl, accessToken, username) => {
     body: formData,
   });
 
-  console.log('Response Status:', response.status); // Add this line to log the response status
 
   if (response.ok) {
     const responseData = await response.text();
-    console.log('API Response:', responseData, response.status);
     return response;
   } else {
-    console.error('API Error:', response.statusText);
     const errorResponse = await response.text();
     console.error('API Error Response:', errorResponse);
     throw new Error(`API Error: ${response.statusText}`);
   }
 };
-
 
 
 const createZipFromDirectory = async (directoryPath) => {
@@ -59,7 +53,6 @@ const createZipFromDirectory = async (directoryPath) => {
     });
 
     output.on('close', async () => {
-      console.log('Zip archive created:', zipFilePath);
       resolve(zipFilePath);
     });
 
@@ -75,11 +68,22 @@ const createZipFromDirectory = async (directoryPath) => {
   });
 };
 
+const setDirectoryPermissions = (directoryPath, mode) => {
+  fs.readdirSync(directoryPath).forEach((file) => {
+    const filePath = path.join(directoryPath, file);
+    fs.chmodSync(filePath, mode);
+    if (fs.statSync(filePath).isDirectory()) {
+      setDirectoryPermissions(filePath, mode);
+    }
+  });
+};
 contextBridge.exposeInMainWorld('versions', {
   node: () => process.versions.node,
   chrome: () => process.versions.chrome,
   electron: () => process.versions.electron,
   ping: () => ipcRenderer.invoke('ping'),
+
+
   
   createDirectory: (username) => {
     try {
@@ -87,12 +91,16 @@ contextBridge.exposeInMainWorld('versions', {
 
       const directoryPath = path.join(projectPath, 'Dentread', username);
 
-      console.log(directoryPath)
 
       if (!fs.existsSync(directoryPath)) {
         fs.mkdirSync(directoryPath, { recursive: true });
+  
+        // Set permissions for the directory and its contents
+        fs.chmodSync(directoryPath, 0o777);
+        setDirectoryPermissions(directoryPath, 0o777);
+  
         localStorage.setItem('dentread_dir', directoryPath);
-        return { success: true, message: `Directory created at ${directoryPath}`,directoryPath:`${directoryPath}` };
+        return { success: true, message: `Directory created at ${directoryPath}`, directoryPath };
       } else {
         localStorage.setItem('dentread_dir', directoryPath);
         return { success: false, message: 'Directory already exists' };
@@ -101,6 +109,7 @@ contextBridge.exposeInMainWorld('versions', {
       return { success: false, message: error.message };
     }
   },
+
   deleteDirectory: () => {
     try {
       const projectPath = './';
@@ -108,19 +117,18 @@ contextBridge.exposeInMainWorld('versions', {
   
       if (fs.existsSync(directoryPath)) {
         rimraf.sync(directoryPath);
-        console.log(`Directory deleted: ${directoryPath}`);
         return { success: true, message: `Directory deleted: ${directoryPath}` };
       } else {
-        console.log('Directory does not exist');
         return { success: false, message: 'Directory does not exist' };
       }
     } catch (error) {
-      console.error('Error deleting directory:', error.message);
       return { success: false, message: error.message };
     }
   },
   emptyDirectory: (directoryName) => {
     try {
+      let currentTimelocal = new Date().toLocaleString();
+
       const projectPath = './';
       const username = localStorage.getItem('savedUsername');
       const dentreadDirectoryPath = path.join(projectPath, 'Dentread');
@@ -142,88 +150,133 @@ contextBridge.exposeInMainWorld('versions', {
           }
           
           fs.rmdirSync(targetPath);
+
+          console.log(`At [${currentTimelocal}] : Sync completed for: ${targetPath}`);
           
-          console.log(`Directory emptied: ${targetPath}`);
           return { success: true, message: `Directory emptied: ${targetPath}` };
         } else if (fs.lstatSync(targetPath).isFile()) {
           fs.unlinkSync(targetPath);
           
-          console.log(`File removed: ${targetPath}`);
+          console.log(`At [${currentTimelocal}] : Sync completed for: ${targetPath}`);
           return { success: true, message: `File removed: ${targetPath}` };
         } else {
-          console.log('Invalid target: Neither a file nor a directory');
           return { success: false, message: 'Invalid target: Neither a file nor a directory' };
         }
       } else {
-        console.log('Target does not exist');
         return { success: false, message: 'Target does not exist' };
       }
     } catch (error) {
-      console.error('Error emptying directory:', error.message);
       return { success: false, message: error.message };
     }
   },
   
-  
+  copylog: function appendLogMessage(message) {
+    var logContainer = document.getElementById('logContainer');
+    var logMessageElement = document.createElement('p');
+    logMessageElement.textContent = message;
+    logContainer.appendChild(logMessageElement);
+},
 
   copyFilesWithCondition: function namedFunction(sourceDirectory, destinationDirectory, fileExtensions) {
     try {
-        if (!fs.existsSync(destinationDirectory)) {
-            fs.mkdirSync(destinationDirectory, { recursive: true });
+      if (!fs.existsSync(destinationDirectory)) {
+          fs.mkdirSync(destinationDirectory, { recursive: true });
         }
+        let currentTime = new Date().toLocaleString();
+
         const items = fs.readdirSync(sourceDirectory);
+        let totalCopied = 0;
+    
+        function processNextItem() {
+          if (totalCopied >= 5) return;
+          if (items.length === 0) return;
+  
+          const item = items.shift();
+          const sourceItemPath = path.join(sourceDirectory, item);
+          const destinationItemPath = path.join(destinationDirectory, item);
+    
+          if (fs.statSync(sourceItemPath).isDirectory()) {
+            const folderNamesSet = new Set(JSON.parse(localStorage.getItem('folderNames')));
+            if (!folderNamesSet.has(item)) {
+              // Create a zip file for the folder if it's not already a zip
+              if (!item.endsWith('.zip')) {
+                const zipFileName = item + '.zip';
+                const output = fs.createWriteStream(path.join(destinationDirectory, zipFileName));
+                const archive = archiver('zip', {
+                  zlib: { level: 9 } // Sets the compression level
+                });
+                output.on('close', () => {
+                  totalCopied++;
+                  console.log(`At [${currentTime}] Copied file: ${sourceItemPath} to ${destinationItemPath}`);
 
-        items.forEach((item, index) => {
-            const sourceItemPath = path.join(sourceDirectory, item);
-            const destinationItemPath = path.join(destinationDirectory, item);
+                 
 
-            if (fs.statSync(sourceItemPath).isDirectory()) {
-                const folderNamesSet = new Set(JSON.parse(localStorage.getItem('folderNames')));
-                if (!folderNamesSet.has(item)) {
-                    fs.mkdirSync(destinationItemPath, { recursive: true });
-                    namedFunction(sourceItemPath, destinationItemPath, fileExtensions);
-                }
+                  processNextItem(); // Continue with the next item
+                });
+                archive.pipe(output);
+                archive.directory(sourceItemPath, false);
+                archive.finalize();
+              } else {
+                processNextItem();
+              }
             } else {
-                const fileExtension = path.extname(item).toLowerCase();
-                if (fileExtensions.includes(fileExtension)) {
-                    const filenameSet = new Set(JSON.parse(localStorage.getItem('filenames')));
-                    if (!filenameSet.has(item)) {
-                        fs.copyFileSync(sourceItemPath, destinationItemPath);
-                    }
-                }
+              processNextItem(); // Continue with the next item
             }
-        });
+          } else {
+            const fileExtension = path.extname(item).toLowerCase();
+            if (fileExtensions.includes(fileExtension)) {
+              const filenameSet = new Set(JSON.parse(localStorage.getItem('filenames')));
+              if (!filenameSet.has(item)) {
+                // Check if the file is already a zip, if not, copy it
+                fs.copyFileSync(sourceItemPath, destinationItemPath);
+                totalCopied++;
+                console.log(`At [${currentTime}] Copied folder: ${sourceItemPath} to ${destinationItemPath}`);
+               
+              } else {
+              }
+            } else {
+            }
+            processNextItem(); // Continue with the next item
+          }
+        }
+    
+        processNextItem();
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    },
+    
+  
 
-        console.log('Files and folders copied successfully');
-        return { success: true, message: 'Files and folders copied successfully' };
-    } catch (error) {
-        console.error('Error copying files:', error.message);
-        throw error;
-    }
-},
 
   listFilesAndFolders: async (directoryPath)=> {
     try {
-      const items = fs.readdirSync(directoryPath);
-      return items.map(item => ({
-        name: item,
-        isDirectory: fs.statSync(path.join(directoryPath, item)).isDirectory()
+      const items = await fs.promises.readdir(directoryPath);
+      const statsPromises = items.map(item => fs.promises.stat(path.join(directoryPath, item)));
+
+      const stats = await Promise.all(statsPromises);
+
+      return items.map((item, index) => ({
+          name: item,
+          isDirectory: stats[index].isDirectory()
       }));
-    } catch (error) {
+  } catch (error) {
       console.error('Error listing files and folders:', error);
       return [];
-    }
+  }
   },
 
 
   hitApiWithFolderPathAndSubdirectories: async (reqdId) => {
     try {
+
+      let currentTime = new Date().toLocaleString();
+      console.log(`At [${currentTime}] : Sync start for: ${reqdId}`);
+
       const savedUsername = localStorage.getItem('savedUsername');
       const currentWorkingDirectory = process.cwd();
-      console.log('reqdId:', reqdId);
   
       const newDirectoryPath = currentWorkingDirectory + '\\' + 'Dentread' + '\\' + savedUsername + '\\' + reqdId;
-      console.log('newDirectoryPath:', newDirectoryPath);
       const apiUrl = 'https://api.dentread.com/datasync/';
       const token = JSON.parse(localStorage.getItem('token'));
       const accessToken = token.access;
@@ -238,12 +291,10 @@ contextBridge.exposeInMainWorld('versions', {
   
         const response = await sendFileToAPI(zipFilePath, apiUrl, accessToken, username);
   
-        console.log('API Request Completed',response);
   
         if (zipFilePath) {
           try {
             await fs.promises.unlink(zipFilePath);
-            console.log('Zip file deleted:', zipFilePath);
           } catch (err) {
             console.error('Error deleting zip file:', err);
           }
@@ -257,7 +308,6 @@ contextBridge.exposeInMainWorld('versions', {
       } else {
         const response = await sendFileToAPI(newDirectoryPath, apiUrl, accessToken, username);
   
-        console.log('API Request Completed', response);
   
         if (response) {
           return response;
@@ -271,9 +321,24 @@ contextBridge.exposeInMainWorld('versions', {
     }
   },
   settingsbuttonfunc: async () => {
-    console.log("this is preload");
     ipcRenderer.invoke('open-settings')
-    }
+    },
+    logButtonfunc: async () => {
+      ipcRenderer.invoke('open-logs')
+      },
+      // sendLogsToMain: async(logs) => {
+      //   console.log("preload func called")
+      //   ipcRenderer.send('download-logs', logs);
+    // },
+    minimizeWindow: async () => {
+      ipcRenderer.send('toggle-auto-sync', true); // Send message to main process to minimize window
+  },
+
+  minimizeWindow2: async () => {
+    ipcRenderer.send('toggle-auto-sync', false); // Send message to main process to minimize window
+},
+
+
 
   
 });

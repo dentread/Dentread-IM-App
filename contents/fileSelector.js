@@ -28,9 +28,7 @@ function fetchExtensions() {
 
     if (!accessToken) {
         console.error('Token not available. Redirecting to login page...');
-        // You might want to handle the case where the token is not available.
     } else {
-        console.log('Token available:', accessToken);
 
         const apiUrl = 'https://api.dentread.com/fileextentions/';
 
@@ -43,7 +41,6 @@ function fetchExtensions() {
         })
         .then(response => {
             if (response.ok) {
-                console.log('API request successful');
                 return response.json();
             } else {
                 console.error('API request error:', response.statusText);
@@ -57,7 +54,6 @@ function fetchExtensions() {
         })
         .catch(error => {
             console.error('API request error:', error.message);
-            // You might want to handle the error case accordingly.
             throw error;
         });
     }
@@ -70,10 +66,9 @@ const func2 = async () => {
     const targetedDir_dentread2 = JSON.parse(localStorage.getItem('firstSelectedPath2'));
     const targetedDir_dentread3 = JSON.parse(localStorage.getItem('firstSelectedPath3'));
     const dentread_dir = localStorage.getItem('dentread_dir');
-    // const fileExtension = ['.stl', '.obj', '.ply', '.fbx', '.dae', '.3ds', '.blend', '.dxf', '.step', '.stp', '.igs', '.iges', '.x3d', '.vrml', '.amf', '.gltf', '.glb', '.usdz', '.3mf', '.wrl', '.xml', '.dcm', '.zip','.png','.jpg','.pdf','.jpeg'];
+
 
     const fileExtension = await fetchExtensions();
-    console.log(fileExtension,"fileExtension")
 
     const isFolderInLocalStorage = (folderName) => {
         return existingFolders.includes(folderName);
@@ -103,27 +98,50 @@ const func2 = async () => {
     }
 };
 
+
+const pushUniqueContents = async (allContents, folderNamesSet, filenamesSet, path) => {
+    const contents = await listDirectoryContents(path);
+    contents.forEach(item => {
+        // Check if the item is not already present in localStorage
+        if (!folderNamesSet.has(item.name) && !filenamesSet.has(item.name)) {
+            allContents.push(item);
+            // Add the item to the appropriate set based on its type (folder or file)
+            if (item.isDirectory) {
+                folderNamesSet.add(item.name);
+            } else {
+                filenamesSet.add(item.name);
+            }
+        }
+    });
+};
+
+
 const viewTargetedFolder = async () => {
     const targetedDir = JSON.parse(localStorage.getItem('firstSelectedPath'));
     const targetedDir2 = JSON.parse(localStorage.getItem('firstSelectedPath2'));
     const targetedDir3 = JSON.parse(localStorage.getItem('firstSelectedPath3'));
     const container = document.getElementById('allStagedFiles');
+    const folderNamesSet = new Set(JSON.parse(localStorage.getItem('folderNames')) || []);
+    const filenamesSet = new Set(JSON.parse(localStorage.getItem('filenames')) || []);
     container.innerHTML = '';
     const allContents = [];
 
+
     if (targetedDir && targetedDir.firstSelectedPath) {
-        const contents = await listDirectoryContents(targetedDir.firstSelectedPath);
-        allContents.push(...contents);
+        await pushUniqueContents(allContents, folderNamesSet, filenamesSet, targetedDir.firstSelectedPath);
     }
 
     if (targetedDir2 && targetedDir2.firstSelectedPath2) {
-        const contents = await listDirectoryContents(targetedDir2.firstSelectedPath2);
-        allContents.push(...contents);
+        await pushUniqueContents(allContents, folderNamesSet, filenamesSet, targetedDir2.firstSelectedPath2);
     }
 
     if (targetedDir3 && targetedDir3.firstSelectedPath3) {
-        const contents = await listDirectoryContents(targetedDir3.firstSelectedPath3);
-        allContents.push(...contents);
+        await pushUniqueContents(allContents, folderNamesSet, filenamesSet, targetedDir3.firstSelectedPath3);
+    }
+
+    if (allContents.length === 0) {
+        container.innerText = 'No files or folders found.';
+        return;
     }
 
     if (allContents.length === 0) {
@@ -140,21 +158,79 @@ const viewTargetedFolder = async () => {
     });
     container.appendChild(ul);
 };
+// const viewTargetedFolder = async () => {
+//     const container = document.getElementById('allStagedFiles');
+//     const storedPaths = new Set(); // Store paths from local storage
+//     const folderNamesSet = new Set(JSON.parse(localStorage.getItem('folderNames')) || []);
+//     const filenamesSet = new Set(JSON.parse(localStorage.getItem('filenames')) || []);
+//     const allContents = [];
+
+//     // Add paths from local storage to the set
+//     for (let i = 1; i <= 3; i++) {
+//         const key = `firstSelectedPath${i}`;
+//         const pathData = JSON.parse(localStorage.getItem(key));
+//         if (pathData && pathData[key]) {
+//             storedPaths.add(pathData[key]);
+//         }
+//     }
+
+//     // Function to retrieve contents and add to allContents if not stored
+//     const retrieveContents = async (path) => {
+//         if (!storedPaths.has(path)) {
+//             const contents = await listDirectoryContents(path);
+//             allContents.push(...contents);
+//         }
+//     };
+
+//     // Retrieve contents for each selected path if not stored
+//     for (let i = 1; i <= 3; i++) {
+//         const key = `firstSelectedPath${i}`;
+//         const pathData = JSON.parse(localStorage.getItem(key));
+//         if (pathData && pathData[key]) {
+//             await retrieveContents(pathData[key]);
+//         }
+//     }
+//     console.log(allContents,"allContents")
+//     console.log(storedPaths,"storedPaths")
+
+
+//     if (allContents.length === 0) {
+//         container.innerText = 'No files or folders found.';
+//         return;
+//     }
+
+//     container.innerHTML = '';
+//     const ul = document.createElement('ul');
+//     ul.className = 'custom-list';
+//     allContents.forEach((item, index) => {
+//         const li = document.createElement('li');
+//         li.textContent = `${item.name.length > 25 ? item.name.substring(0, 25) + '...' : item.name}`;
+//         ul.appendChild(li);
+//     });
+//     container.appendChild(ul);
+// };
+
 
 const listDirectoryContents = async (directoryPath) => {
     const response = await window.versions.listFilesAndFolders(directoryPath);
     return response;
 };
 
+let func2Running = false;
 const syncButton = document.getElementById('stageToSync');
 syncButton.addEventListener('click', () => {
+    func2Running = false;
     viewTargetedFolder()
-    .then(() => fetchData())
+    .then(() => {fetchData()
+    })
     .then(() => {
         func6();
     })
     .then(() => {
         func2();
+    })
+    .then(() => {
+        func2Running = true;
     });
 });
 
@@ -200,7 +276,13 @@ const viewTargetedFolderdentraed = async () => {
 };
 
 const syncButtondentreadstage = document.getElementById('syncToDentreadId');
-syncButtondentreadstage.addEventListener('click', viewTargetedFolderdentraed);
+syncButtondentreadstage.addEventListener('click', () => {
+if (func2Running) {
+    viewTargetedFolderdentraed();
+} else {
+    console.log('func2 is still running. wait for sync');
+}
+});
 
 const func3 = async (reqdId, loaderDiv) => {
     const timeoutMs = 10 * 60 * 1000;
@@ -238,6 +320,7 @@ const func3 = async (reqdId, loaderDiv) => {
                 timeoutImage.height = 12;
                 timeoutImage.style.marginLeft = '20px';
                 loaderDiv.replaceWith(timeoutImage);
+                
             } else if (response) {
                 const successImage = document.createElement('img');
                 successImage.src = '../images/tick-check.png';
@@ -275,19 +358,43 @@ const func3 = async (reqdId, loaderDiv) => {
     }
 };
 
+
+
 const settingsButton = document.getElementById('settingsButton');
 settingsButton.addEventListener('click', async () => {
     await window.versions.settingsbuttonfunc();
 });
 
+const autosyncminimize = document.getElementById('onoffsync');
+
+autosyncminimize.addEventListener('click', async () => {
+    if (autosyncminimize.checked) {
+        // Run the code only if the checkbox is checked
+        document.getElementById('headermessage').textContent = 'Autosync is running...';
+        await window.versions.copylog();
+
+        await window.versions.minimizeWindow();
+    }
+    else {
+        // If unchecked, send false to the main process
+        document.getElementById('headermessage').textContent = '';
+        await window.versions.minimizeWindow2();
+    }
+
+});
+
+const logButton = document.getElementById('log');
+logButton.addEventListener('click', async () => {
+    await window.versions.logButtonfunc();
+});
 const logoutButton = document.getElementById('logoutbutton');
 logoutButton.addEventListener('click', () => {
     window.location.href = 'login_dentread.html';
 });
 
-const func5 = async () => {
-    const response = await window.versions.deleteDirectory();
-};
+// const func5 = async () => {
+//     const response = await window.versions.deleteDirectory();
+// };
 
 const func7 = async (newDirectoryPath) => {
     const response = await window.versions.emptyDirectory(newDirectoryPath);
@@ -310,8 +417,8 @@ const func6 = async () => {
     // Return a resolved promise
     return Promise.resolve();
 };
+
 function fetchData() {
-    console.log("inside fetchData")
     const token = JSON.parse(localStorage.getItem('token'));
     let acces_token= token.access;
 
@@ -319,7 +426,6 @@ function fetchData() {
         console.error('Token not available. Redirecting to login page...');
         window.location.href = 'login_dentread.html';
     } else {
-        console.log('Token available:', acces_token);
 
         const apiUrl = 'https://api.dentread.com/user-folders/';
 
@@ -332,7 +438,6 @@ function fetchData() {
         })
         .then(response => {
             if (response.ok) {
-                console.log('API request successful');
                 return response.json();
             } else {
                 console.error('API request error:', response.statusText);
@@ -360,3 +465,24 @@ function fetchData() {
         });
     }
 };
+
+
+// Define the captureConsoleLogs function first
+// const captureConsoleLogs = async () => {
+//     console.log("func called")
+//     const logs = [];
+//     const oldConsoleLog = console.log;
+//     console.log("oldConsoleLog",logs)
+//     console.log = function (message) {
+//         logs.push(message);
+//         oldConsoleLog.apply(console, arguments);
+//     };
+//     if (logs.length > 0) {
+//         const response = await window.versions.sendLogsToMain(logs);
+//         // Do something with the response here if needed
+//         console.log("Response from server:", response);
+//     }
+// }
+
+// // Attach the event listener after defining the function
+// document.getElementById('downloadLinkclient').addEventListener('click', captureConsoleLogs);

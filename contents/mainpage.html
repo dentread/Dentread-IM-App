@@ -8,12 +8,40 @@
     <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="../assets/mainpage.css">
     <link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.css">
+    <style>
+        #headermessage {
+            position: absolute;
+            top: 5%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: red;
+            animation: blinkHeader 1s linear infinite alternate;
+        }
+
+        @keyframes blinkHeader {
+            0% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="main-content">
         <div class="container-fluid">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="onoffsync">
+                <label class="form-check-label" for="onoffsync">Auto/Sync</label>
+                <h5 id="headermessage"></h5>
+                
+            </div>
+            
             <div class="col-sm-12 logout-header">
+                
                 <button class="btn settings-button ml-auto" id="settingsButton"><i class="fa fa-cog" aria-hidden="true"></i> Settings</button>
+                <button class="btn settings-button button ml-auto" id="log"><i class="fa fa-file-alt" aria-hidden="true"></i> Log files</button>
                 <button class="btn logout-button ml-auto" id="logoutbutton"><i class="fa fa-power-off mr-2" aria-hidden="true"></i> Logout</button>
             </div>
             <div class="col-sm-12 col-lg-12 col-xl-12 mb-4">
@@ -44,9 +72,10 @@
                     <div class="row">
                       <div class="col-sm-6 mt-3">
                         <div class="staged">
-                            <div class="heading-part">
-                                <h6>Files Ready To Be Synced</h6>
-                                <button type="button" class="btn button-basic-without-border" id="stageToSync"><i class="fa fa-refresh custom-margin" aria-hidden="true"></i></button>
+                            <div class="heading-part extra-padding">
+                                <h6>Files ready to be synced</h6>
+
+                                <button type="button" class="btn2 button-basic-without-border" id="stageToSync"><i class="fa fa-refresh custom-margin" aria-hidden="true"></i></button>
                             </div>
                             <div class="container text-area custom-scrollbar mt-2" id="allStagedFiles">
                             </div>
@@ -55,7 +84,7 @@
                       <div class="col-sm-6 mt-3" id="stgToSyncdentread">
                         <div class="dentreadstage">
                             <div class="heading-part extra-padding">
-                                <h6>Syncing To Dentread</h6>
+                                <h6>Syncing to Dentread</h6>
                                 <button type="button" class="d-none" disabled="true"><i class="fa fa-refresh custom-margin" aria-hidden="true"></i>Ok</button>
                             </div>
                             <div class="container text-area custom-scrollbar mt-2" id="allStagedFilesdentread">
@@ -64,42 +93,77 @@
                       </div>
                     </div>
                 </div>
+                <div >
+
                 <div class="dentreadSyncing container mt-6 d-flex justify-content-center align-items-center">
+
                     <button class="syncToDentread" id="syncToDentreadId">Sync To Dentread</button>
+
                 </div>
+                
             </div>
+            <!-- <a href="#" id="downloadLinkclient" class="primary-button">Download Log client</a> -->
+
         </div>
     </div>
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // Find the button with the ID "stageToSync" and store it in the variable 'button'.
+ document.addEventListener("DOMContentLoaded", function() {
+
+
+        function isButtonOn() {
+            var button = document.getElementById("onoffsync");
+
+            return button.checked; 
+        }
+        function disableButton(disable) {
+        var button = document.getElementById("stageToSync");
+        var button2 = document.getElementById("syncToDentreadId");
+        button.style.opacity = disable ? "0" : "1";
+        button.style.pointerEvents = disable ? "none" : "auto";
+        button2.style.opacity = disable ? "0" : "1";
+        button2.style.pointerEvents = disable ? "none" : "auto";
+        }
+
+
+        if (isButtonOn()) {
             var button = document.getElementById("stageToSync");
-    
-            // Simulate a click on the first button.
+
             button.click();
-    
-            // Schedule the first button click after 30 seconds.
+
             setTimeout(function() {
                 simulateButtonClick("syncToDentreadId", 30000);
-            }, 30000); // 30 seconds
-        });
+            }, 30000);
+            disableButton(true);
+
+        }
     
-        // This function simulates a button click with a specified delay between clicks.
         function simulateButtonClick(buttonId, delay) {
-            // Find the button with the specified ID and store it in the variable 'button'.
             var button = document.getElementById(buttonId);
     
-            // Simulate a click on the button.
             button.click();
     
-            // Log a message to the console indicating that the click is completed.
             console.log(buttonId + " click completed.");
     
-            // Schedule the next click after the specified delay.
             setTimeout(function() {
-                simulateButtonClick(buttonId === "stageToSync" ? "syncToDentreadId" : "stageToSync", buttonId === "stageToSync" ? 300000 : 30000);
+                simulateButtonClick(buttonId === "stageToSync" ? "syncToDentreadId" : "stageToSync", buttonId === "stageToSync" ? 120000 : 30000);
             }, delay);
         }
+        document.getElementById("onoffsync").addEventListener("change", function() {
+            if (isButtonOn()) {
+                var button = document.getElementById("stageToSync");
+                button.click();
+                setTimeout(function() {
+                    simulateButtonClick("syncToDentreadId", 30000);
+                }, 30000);
+                disableButton(true);
+            }
+            else{
+                disableButton(false);
+            }
+
+        });
+    });
+
     
     </script>
 

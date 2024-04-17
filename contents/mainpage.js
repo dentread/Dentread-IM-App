@@ -9,7 +9,6 @@ function fetchData() {
 
         window.location.href = 'login_dentread.html';
     } else {
-        console.log('Token available:', acces_token);
 
         const apiUrl = 'https://api.dentread.com/user-folders/';
 
@@ -32,7 +31,6 @@ function fetchData() {
         })
         .then(data => {
 
-            console.log('API response:', data);
 
             const folderNamesSet = new Set();
             const filenamesSet = new Set();

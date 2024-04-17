@@ -1,10 +1,14 @@
 const { app, BrowserWindow, Menu, ipcMain, dialog } = require('electron');
 const path = require('node:path');
-const rimraf = require('rimraf');
 const fs = require('fs');
 const url = require('url');
+const notifier = require('node-notifier');
+const cron = require('node-cron');
+const { execSync } = require('child_process');
+
 const { autoUpdater,AppUpdater } = require("electron-updater");
 
+let notificationSent = false;
 
 autoUpdater.autoDownload = false;
 
@@ -39,8 +43,45 @@ app.on('ready', () => {
     console.log(`Download speed: ${progressObj.bytesPerSecond}`);
     console.log(`Downloaded ${progressObj.percent}%`);
   });
+
+  cron.schedule('* * * * *', () => {
+    // Check if the Electron application is running
+    const isElectronRunning = isProcessRunning('electron');
+
+    if (!isElectronRunning) {
+      // Electron application is not running, start counting time
+      let timeSinceClosed = 0;
+      const intervalId = setInterval(() => {
+        timeSinceClosed += 1; // Increment time by 1 minute
+
+        // Check if 2 minutes have passed since the app was closed
+        if (timeSinceClosed >= 2 && !notificationSent) {
+          // Send notification
+          notifier.notify({
+            title: 'App Notification',
+            message: 'Your app needs attention!',
+            sound: true,
+            wait: true
+          });
+          notificationSent = true; // Mark notification as sent
+          
+          // Stop the interval
+          clearInterval(intervalId);
+        }
+      }, 60000); // 1 minute interval
+    }
+  });
+
 });
 
+function isProcessRunning(processName) {
+  try {
+    execSync(`pgrep -x ${processName}`);
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
 
 let mainWindow;
 let customDialog;
@@ -58,12 +99,57 @@ function createWindow() {
   });
 
   mainWindow.loadFile('contents/login_dentread.html');
+  function preventClose(event) {
+    event.preventDefault();
+  
+    try {
+      // Show a warning dialog
+      const { dialog } = require('electron');
+      dialog.showMessageBox(mainWindow, {
+        type: 'warning',
+        title: 'Warning',
+        message: 'Closing the window is not allowed while auto sync is on.',
+        buttons: ['OK']
+      });
+    } catch (error) {
+      console.error('Error showing warning dialog:', error);
+    }
+  }
   mainWindow.once('ready-to-show', () => {
-    // Check for updates and notify
     autoUpdater.checkForUpdatesAndNotify();
+
+    ipcMain.on('toggle-auto-sync', (event, status) => {
+      if (status) {
+        mainWindow.minimize();
+        mainWindow.on('close', preventClose);
+
+      } else {
+        if (mainWindow.isMinimized()) {
+          mainWindow.restore();
+        }
+        mainWindow.removeListener('close', preventClose);
+      }
+     
+    });
   });
-  // mainWindow.webContents.openDevTools();
+
+  mainWindow.on('close', (event) => {
+    const choice = require('electron').dialog.showMessageBoxSync(mainWindow, {
+      type: 'question',
+      buttons: ['Yes', 'No'],
+      title: 'Confirm',
+      message: 'Are you sure you want to close the application?'
+    })
+    if (choice === 1) {
+      event.preventDefault()
+    }
+  })
+
+  
+  mainWindow.webContents.openDevTools();
 }
+
+
 
 app.whenReady().then(() => {
   ipcMain.handle('ping', () => 'pong');
@@ -93,6 +179,8 @@ app.whenReady().then(() => {
   Menu.setApplicationMenu(null);
 });
 
+
+
 function createCustomDialog() {
   customDialog = new BrowserWindow({
     width: 450,
@@ -105,6 +193,7 @@ function createCustomDialog() {
     icon: path.join(__dirname, 'images/MySettings.png'),
     title: 'Settings',
   });
+
 
   customDialog.loadURL(url.format({
     pathname: path.join(__dirname, 'contents/settings.html'),
@@ -128,21 +217,127 @@ ipcMain.handle('open-settings', () => {
     createCustomDialog();
   }
 
+
   return true;
 });
 
-app.on('window-all-closed', () => {
-  const projectPath = './';
-  const directoryPath = path.join(projectPath, 'Dentread');
+let customlog;
+function createcustomlog() {
+  customlog = new BrowserWindow({
+    width: 500,
+    height: 500,
+    parent: mainWindow,
+    modal: true,
+    show: false,
+    minimizable: false,
+    maximizable: false,
+    icon: path.join(__dirname, 'images/PlusFolder.png'),
+    title: 'Log',
+  });
 
-  if (fs.existsSync(directoryPath)) {
-    rimraf.sync(directoryPath);
-    console.log(`Directory deleted: ${directoryPath}`);
-  } else {
-    console.log('Directory does not exist');
+  // customlog.webContents.openDevTools();
+
+  customlog.loadURL(url.format({
+    pathname: path.join(__dirname, 'contents/log.html'),
+    protocol: 'file:',
+    slashes: true,
+  }));
+
+  customlog.setMenu(null);
+
+  customlog.once('ready-to-show', () => {
+    customlog.show();
+  });
+
+  customlog.on('closed', () => {
+    customlog = null;
+  });
+}
+
+ipcMain.handle('open-logs', () => {
+  if (!customlog) {
+    createcustomlog();
+    
   }
 
-  if (process.platform !== 'darwin') {
-    app.quit();
+// ipcMain.on('download-logs', (event, logs) => {
+//     // Convert logs array to string
+//     const logsString = logs.join('\n');
+
+//     // Show save dialog to choose save location
+//     dialog.showSaveDialog(mainWindow, {
+//         defaultPath: 'logs.txt', // Default filename
+//         filters: [{ name: 'Text Files', extensions: ['txt'] }] // Filter for text files
+//     }).then((result) => {
+//         if (!result.canceled) {
+//             // Write logs to the selected file
+//             fs.writeFile(result.filePath, logsString, (err) => {
+//                 if (err) {
+//                     console.error('Error saving logs:', err);
+//                     return;
+//                 }
+//                 console.log('Logs saved successfully!');
+//             });
+//         }
+//     }).catch((err) => {
+//         console.error('Error saving logs:', err);
+//     });
+// });
+
+  return true;
+});
+
+// app.on('window-all-closed', async () => {
+//   const projectPath = './';
+//   const directoryPath = path.join(projectPath, 'Dentread');
+
+//   const deleteDirectoryContents = (directoryPath) => {
+//     try {
+//       // Read the directory synchronously
+//       const files = fs.readdirSync(directoryPath);
+  
+//       // Iterate through each file and delete it
+//       files.forEach((file) => {
+//         const filePath = path.join(directoryPath, file);
+//         fs.unlinkSync(filePath); // Delete the file
+//         console.log(`Deleted file: ${filePath}`);
+//       });
+  
+//       console.log(`All files in directory ${directoryPath} deleted successfully.`);
+//     } catch (error) {
+//       console.error(`Error deleting directory contents: ${error}`);
+//     }
+//   };
+
+  // Check if the directory exists
+//   if (fs.existsSync(directoryPath)) {
+//     // Attempt to empty the directory contents
+//     try {
+//       await deleteDirectoryContents(directoryPath);
+//     } catch (error) {
+//       console.error('Error emptying directory contents:', error);
+//     }
+//   } else {
+//     console.log('Directory does not exist');
+//   }
+
+//   // Quit the application if not on macOS
+//   if (process.platform !== 'darwin') {
+//     app.quit();
+//   }
+// });
+
+ipcMain.on('logInfo', (event, message) => {
+  const logWindow = BrowserWindow.getAllWindows().find(window => window.getTitle() === 'Log');
+  if (logWindow) {
+    logWindow.webContents.send('logInfo', message);
   }
 });
+
+ipcMain.on('logError', (event, error) => {
+  const logWindow = BrowserWindow.getAllWindows().find(window => window.getTitle() === 'Log');
+  if (logWindow) {
+    logWindow.webContents.send('logError', error);
+  }
+});
+
