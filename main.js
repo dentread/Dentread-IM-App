@@ -512,7 +512,7 @@ app.on('before-quit', () => {
 let customSchedule;
 function createCustomScheduler() {
   customSchedule = new BrowserWindow({
-    width: 450,
+    width: 520,
     height: 420,
     parent: mainWindow,
     modal: true,
@@ -539,7 +539,7 @@ function createCustomScheduler() {
   customSchedule.on('closed', () => {
     customSchedule = null;
   });
-  customSchedule.webContents.openDevTools();
+  // customSchedule.webContents.openDevTools();
 }
 
 ipcMain.handle('open-scheduler', () => {
