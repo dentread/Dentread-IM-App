@@ -30,7 +30,7 @@ function fetchExtensions() {
         console.error('Token not available. Redirecting to login page...');
     } else {
 
-        const apiUrl = 'https://api.dentread.com/fileextentions/';
+        const apiUrl = 'http://testapi.dentread.com/fileextentions/';
 
         return fetch(apiUrl, {
             method: 'GET',
@@ -427,7 +427,7 @@ function fetchData() {
         window.location.href = 'login_dentread.html';
     } else {
 
-        const apiUrl = 'https://api.dentread.com/user-folders/';
+        const apiUrl = 'http://testapi.dentread.com/user-folders/';
 
         fetch(apiUrl, {
             method: 'GET',
