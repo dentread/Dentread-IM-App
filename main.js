@@ -210,7 +210,6 @@ function createCustomDialog() {
   customDialog.on('closed', () => {
     customDialog = null;
   });
-  customDialog.webContents.openDevTools();
 }
 
 ipcMain.handle('open-settings', () => {
