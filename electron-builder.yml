@@ -4,8 +4,12 @@ directories:
   output: ./DentreadBuild11
 files:
   - "**/*"
+  - "notification.js"
+  - "notificationProcess.pid"
+
 extraResources:
   - assets/**
+  - images/**
 asar: true
 publish:
   provider: github
@@ -14,6 +18,7 @@ publish:
 win:
   target: nsis
   icon: "images/LogoDentread.png"
+
   publisherName: "Dentread"
   artifactName: "${productName}-Setup-${version}.${ext}"
   squirrelWindows:

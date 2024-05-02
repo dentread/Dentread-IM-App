@@ -365,19 +365,28 @@ settingsButton.addEventListener('click', async () => {
     await window.versions.settingsbuttonfunc();
 });
 
+
+const scheduleButton = document.getElementById('scheduleSyncBtn');
+scheduleButton.addEventListener('click', async () => {
+    await window.versions.schedulerbuttonfunc();
+});
+
+
 const autosyncminimize = document.getElementById('onoffsync');
 
 autosyncminimize.addEventListener('click', async () => {
     if (autosyncminimize.checked) {
         // Run the code only if the checkbox is checked
         document.getElementById('headermessage').textContent = 'Autosync is running...';
-        await window.versions.copylog();
+        document.getElementById('headermessage').style.color = 'green';
 
         await window.versions.minimizeWindow();
     }
     else {
         // If unchecked, send false to the main process
-        document.getElementById('headermessage').textContent = '';
+        document.getElementById('headermessage').textContent = 'Autosync Disabled';
+        document.getElementById('headermessage').style.color = 'red';
+
         await window.versions.minimizeWindow2();
     }
 
@@ -486,3 +495,48 @@ function fetchData() {
 
 // // Attach the event listener after defining the function
 // document.getElementById('downloadLinkclient').addEventListener('click', captureConsoleLogs);
+
+function Scheduleevent() {
+    const token = JSON.parse(localStorage.getItem('token'));
+    let acces_token= token.access;
+
+    if (!token) {
+        console.error('Token not available. Redirecting to login page...');
+        window.location.href = 'login_dentread.html';
+    } else {
+
+        const apiUrl = 'http://testapi.dentread.com/getschedule/';
+
+        fetch(apiUrl, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${acces_token}`,
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                console.error('API request error:', response.statusText);
+            }
+        })
+        .then(data => {
+            const times = [];
+            const ips = [];
+
+            data.forEach(item => {
+                times.push(item.time);
+                ips.push(item.ip);
+            });
+
+            localStorage.setItem('time', JSON.stringify(times));
+            localStorage.setItem('ip', JSON.stringify(ips));
+        })
+        .catch(error => {
+            console.error('API request error:', error.message);
+        });
+    
+    }
+};
+
