@@ -365,6 +365,13 @@ settingsButton.addEventListener('click', async () => {
     await window.versions.settingsbuttonfunc();
 });
 
+
+const scheduleButton = document.getElementById('scheduleSyncBtn');
+scheduleButton.addEventListener('click', async () => {
+    await window.versions.schedulerbuttonfunc();
+});
+
+
 const autosyncminimize = document.getElementById('onoffsync');
 
 autosyncminimize.addEventListener('click', async () => {

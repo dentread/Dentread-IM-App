@@ -509,3 +509,43 @@ app.on('before-quit', () => {
 
   startNotificationProcess();
 });
+
+let customSchedule;
+function createCustomScheduler() {
+  customSchedule = new BrowserWindow({
+    width: 450,
+    height: 420,
+    parent: mainWindow,
+    modal: true,
+    show: false,
+    minimizable: false,
+    maximizable: false,
+    icon: path.join(__dirname, 'images/MySettings.png'),
+    title: 'Scheduler',
+  });
+
+
+  customSchedule.loadURL(url.format({
+    pathname: path.join(__dirname, 'contents/Scheduler.html'),
+    protocol: 'file:',
+    slashes: true,
+  }));
+
+  customSchedule.setMenu(null);
+
+  customSchedule.once('ready-to-show', () => {
+    customSchedule.show();
+  });
+
+  customSchedule.on('closed', () => {
+    customSchedule = null;
+  });
+  customSchedule.webContents.openDevTools();
+}
+
+ipcMain.handle('open-scheduler', () => {
+  if (!customSchedule) {
+    createCustomScheduler();
+  }
+  return true;
+});

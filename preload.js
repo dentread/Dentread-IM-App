@@ -331,6 +331,11 @@ contextBridge.exposeInMainWorld('versions', {
       ipcRenderer.send('toggle-auto-sync', true, syncedFoldersJSON); // Send message to main process to minimize window
   },
 
+
+  schedulerbuttonfunc: async () => {
+    ipcRenderer.invoke('open-scheduler')
+    },
+
   minimizeWindow2: async () => {
     function sendTestNotification() {
       setTimeout(function() {
