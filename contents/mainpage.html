@@ -39,12 +39,11 @@
             </div>
             
             <div class="col-sm-12 logout-header">
-                
-                <button class="btn settings-button ml-auto" id="settingsButton"><i class="fa fa-cog" aria-hidden="true"></i> Settings</button>
-                <button class="btn settings-button button ml-auto" id="log"><i class="fa fa-file-alt" aria-hidden="true"></i> Log files</button>
-                <button class="btn logout-button ml-auto" id="logoutbutton"><i class="fa fa-power-off mr-2" aria-hidden="true"></i> Logout</button>
+                <button class="btn settings-button dentread-button button ml-auto" id="log"><i class="fas fa-info-circle"></i> Logs</button>
+                <button class="btn settings-button dentread-button ml-auto" id="settingsButton"><i class="fa fa-cog" aria-hidden="true"></i> Settings</button>
+                <button class="btn logout-button ml-auto" id="logoutbutton"><i class="fas fa-sign-out-alt"></i> Logout</button>
             </div>
-            <div class="col-sm-12 col-lg-12 col-xl-12 mb-4">
+            <div class="col-sm-12 col-lg-12 col-xl-12 mb-5">
                 <div class="row row-sm  mt-lg-4">
                     <div class="col-sm-12 col-lg-12 col-xl-12">
                         <div class="card enclosing-card card-box">
@@ -67,15 +66,37 @@
                     </div>
                 </div>
             </div>
+            <div class="col-sm-12 col-lg-12 col-xl-12 pb-5 d-flex flex-wrap justify-content-between align-items-center auto-sync-action">
+                <div class="upload-status-head col-md-6">
+                    <h6 class="m-0">Data Syncing</h6>
+                </div>
+                <div class="upload-status-body col-md-6 text-end">
+                    <button type="button" class="btn dentread-button ml-auto" id="stageToSync"><i class="fa fa-refresh" aria-hidden="true"></i></button>
+                    <button class="btn dentread-button ml-auto active-button-identify" id="manualSyncBtn">Manual Sync</button>
+                    <button class="btn dentread-button ml-auto" id="scheduleSyncBtn">Schedule Sync</button>
+                </div>
+                <div class="upload-progress-bar col-md-12 pt-3">
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
+                    </div>
+                </div>
+                <div class="upload-progress-status col-md-12 pt-1 text-end">
+                    <div class="progress-status">
+                        <i class="fas fa-folder"></i>
+                        <span class="uploaded-file">2</span>
+                        <span class="count-devider"> / </span>
+                        <span class="total-file">30</span>
+                    </div>
+                </div>
+            </div>
+
             <div class="syncing-workflow" id="stgToSync">
-                <div class="container-fluid">
+                <div class="container-fluid p-0">
                     <div class="row">
                       <div class="col-sm-6 mt-3">
                         <div class="staged">
                             <div class="heading-part extra-padding">
                                 <h6>Files ready to be synced</h6>
-
-                                <button type="button" class="btn2 button-basic-without-border" id="stageToSync"><i class="fa fa-refresh custom-margin" aria-hidden="true"></i></button>
                             </div>
                             <div class="container text-area custom-scrollbar mt-2" id="allStagedFiles">
                             </div>
@@ -96,9 +117,7 @@
                 <div >
 
                 <div class="dentreadSyncing container mt-6 d-flex justify-content-center align-items-center">
-
-                    <button class="syncToDentread" id="syncToDentreadId">Sync To Dentread</button>
-
+                    <button class="syncToDentread" id="syncToDentreadId"><i class="fas fa-cloud-upload-alt"></i> Sync to Dentread</button>
                 </div>
                 
             </div>
