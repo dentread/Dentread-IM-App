@@ -6,6 +6,8 @@ const axios = require('axios');
 const archiver = require('archiver');
 const rimraf = require('rimraf');
 const fetch = require('node-fetch');
+const notifier = require('node-notifier');
+
 
 const sendFileToAPI = async (filePath, apiUrl, accessToken, username) => {
   const folderName_withzip = path.basename(filePath);
@@ -170,12 +172,6 @@ contextBridge.exposeInMainWorld('versions', {
     }
   },
   
-  copylog: function appendLogMessage(message) {
-    var logContainer = document.getElementById('logContainer');
-    var logMessageElement = document.createElement('p');
-    logMessageElement.textContent = message;
-    logContainer.appendChild(logMessageElement);
-},
 
   copyFilesWithCondition: function namedFunction(sourceDirectory, destinationDirectory, fileExtensions) {
     try {
@@ -277,7 +273,7 @@ contextBridge.exposeInMainWorld('versions', {
       const currentWorkingDirectory = process.cwd();
   
       const newDirectoryPath = currentWorkingDirectory + '\\' + 'Dentread' + '\\' + savedUsername + '\\' + reqdId;
-      const apiUrl = 'https://api.dentread.com/datasync/';
+      const apiUrl = 'http://testapi.dentread.com/datasync/';
       const token = JSON.parse(localStorage.getItem('token'));
       const accessToken = token.access;
       const username = localStorage.getItem('savedUsername');
@@ -331,10 +327,26 @@ contextBridge.exposeInMainWorld('versions', {
       //   ipcRenderer.send('download-logs', logs);
     // },
     minimizeWindow: async () => {
-      ipcRenderer.send('toggle-auto-sync', true); // Send message to main process to minimize window
+      const syncedFoldersJSON = localStorage.getItem('folderNames');
+      ipcRenderer.send('toggle-auto-sync', true, syncedFoldersJSON); // Send message to main process to minimize window
   },
 
   minimizeWindow2: async () => {
+    function sendTestNotification() {
+      setTimeout(function() {
+        notifier.notify({
+          title: 'Dentread IM App Auto Sync Notification',
+          message: 'This is to notify that auto sync is off',
+          sound: true,
+          wait: true,
+          icon: path.join(__dirname, 'images/LogoDentread.png'),
+
+        });
+      }, 300000); // 1 minute in milliseconds
+    }
+    
+    // Call the function to send the notification after 1 minute
+    const intervalId = sendTestNotification();
     ipcRenderer.send('toggle-auto-sync', false); // Send message to main process to minimize window
 },
 

@@ -1,16 +1,33 @@
-const { app, BrowserWindow, Menu, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, Menu, ipcMain, dialog, Tray  } = require('electron');
 const path = require('node:path');
 const fs = require('fs');
 const url = require('url');
 const notifier = require('node-notifier');
 const cron = require('node-cron');
-const { execSync } = require('child_process');
+const { exec } = require('child_process');
+// const Store = require('electron-store');
+// const store = new Store();
+
+let tray;
+
+
+
+
+
 
 const { autoUpdater,AppUpdater } = require("electron-updater");
 
-let notificationSent = false;
+// let notificationSent = false;
 
 autoUpdater.autoDownload = false;
+
+
+const pidFilePath = './notificationProcess.pid';
+
+let notificationProcess = null;
+
+
+
 
 app.on('ready', () => {
   autoUpdater.checkForUpdates();
@@ -44,42 +61,61 @@ app.on('ready', () => {
     console.log(`Downloaded ${progressObj.percent}%`);
   });
 
-  cron.schedule('* * * * *', () => {
-    // Check if the Electron application is running
-    const isElectronRunning = isProcessRunning('electron');
+  tray = new Tray(path.join(__dirname, 'images/LogoDentread.png'));
 
-    if (!isElectronRunning) {
-      // Electron application is not running, start counting time
-      let timeSinceClosed = 0;
-      const intervalId = setInterval(() => {
-        timeSinceClosed += 1; // Increment time by 1 minute
+  console.log(tray)
 
-        // Check if 2 minutes have passed since the app was closed
-        if (timeSinceClosed >= 2 && !notificationSent) {
-          // Send notification
-          notifier.notify({
-            title: 'App Notification',
-            message: 'Your app needs attention!',
-            sound: true,
-            wait: true
-          });
-          notificationSent = true; // Mark notification as sent
-          
-          // Stop the interval
-          clearInterval(intervalId);
-        }
-      }, 60000); // 1 minute interval
-    }
-  });
+
 
 });
 
-function isProcessRunning(processName) {
-  try {
-    execSync(`pgrep -x ${processName}`);
-    return true;
-  } catch (error) {
-    return false;
+// function isProcessRunning(processName) {
+//   if (process.platform === 'win32' || process.platform === 'win64') {
+//     // Use tasklist on Windows
+//     try {
+//       execSync(`tasklist /FI "IMAGENAME eq ${processName}.exe"`);
+//       console.log("jkj",processName)
+//       return true;
+//     } catch (error) {
+//       return false;
+//     }
+//   } else {
+//     // Use pgrep on Unix-like systems
+//     try {
+//       execSync(`pgrep -x ${processName}`);
+//       return true;
+//     } catch (error) {
+//       return false;
+//     }
+//   }
+// }
+
+
+function retrieveNotificationProcess() {
+  if (fs.existsSync(pidFilePath)) {
+    const pid = parseInt(fs.readFileSync(pidFilePath, 'utf8'));
+    try {
+      process.kill(pid, 0); // Check if process exists
+      notificationProcess = pid; // Assign the PID if it exists
+    } catch (error) {
+      console.error(`Notification process with PID ${pid} not found.`);
+      fs.unlinkSync(pidFilePath); // Remove the PID file
+    }
+  }
+}
+
+
+function stopNotificationProcess() {
+  if (notificationProcess) {
+    try {
+      console.log(notificationProcess,"kkk")
+
+      process.kill(notificationProcess);
+      notificationProcess = null; // Clear the reference
+      fs.unlinkSync(pidFilePath); // Remove the PID file
+    } catch (error) {
+      console.error(`Error killing notification process: ${error}`);
+    }
   }
 }
 
@@ -98,7 +134,27 @@ function createWindow() {
     },
   });
 
+
   mainWindow.loadFile('contents/login_dentread.html');
+  retrieveNotificationProcess();
+  console.log(notificationProcess,"lll")
+
+  stopNotificationProcess();
+
+  function sendTestNotification() {
+    setTimeout(function() {
+      notifier.notify({
+        title: 'IM App Session Expiry',
+        message: 'Your IM App session will expire soon please logout and login again',
+        sound: true,
+        wait: true,
+        icon: path.join(__dirname, 'images/LogoDentread.png'),
+
+      });
+    }, 2147483647);
+  }
+  sendTestNotification();
+
   function preventClose(event) {
     event.preventDefault();
   
@@ -118,10 +174,58 @@ function createWindow() {
   mainWindow.once('ready-to-show', () => {
     autoUpdater.checkForUpdatesAndNotify();
 
-    ipcMain.on('toggle-auto-sync', (event, status) => {
+    ipcMain.on('toggle-auto-sync', (event, status, syncedFoldersJSON) => {
       if (status) {
-        mainWindow.minimize();
-        mainWindow.on('close', preventClose);
+        mainWindow.hide();
+
+          mainWindow.on('close', preventClose);
+          const contextMenu = Menu.buildFromTemplate([
+            { label: 'Open', click: () => mainWindow.show() }, // Option to open the window
+            { type: 'separator' },
+            { label: 'Quit', role: 'quit' } // Option to quit the application
+          ]);
+        
+          // Set the context menu for the tray
+          tray.setContextMenu(contextMenu);
+        
+          tray.on('click', () => {
+            // If the window is hidden, show it
+            if (!mainWindow.isVisible()) {
+              mainWindow.show();
+            } else {
+              // If the window is already visible, focus it
+              mainWindow.focus();
+            }
+          });
+  
+          // Define the function to update notification
+          function updateNotification() {
+              const syncedFoldersArray = JSON.parse(syncedFoldersJSON);
+              console.log(syncedFoldersArray, "syncedFoldersArray");
+  
+              if (Array.isArray(syncedFoldersArray)) {
+                  const totalCount = syncedFoldersArray.length;
+  
+                  // Display a notification with the count using node-notifier
+                  notifier.notify({
+                      title: 'Dentraed IM App Sync Update',
+                      message: `Successfully Synced ${totalCount} Scans.`,
+                      sound: true,
+                      wait: true,
+                      icon: path.join(__dirname, 'images/LogoDentread.png'),
+
+                  });
+              } else {
+                  console.error('Synced folders array not found in local storage.');
+              }
+          }
+       
+        try {
+          // Call the updateNotification function at intervals
+          const intervalId = setInterval(updateNotification, 1 * 60 * 1000);}
+          catch (error) {
+            console.error('Error in auto-update process:', error);
+          }
 
       } else {
         if (mainWindow.isMinimized()) {
@@ -133,13 +237,18 @@ function createWindow() {
     });
   });
 
+
   mainWindow.on('close', (event) => {
     const choice = require('electron').dialog.showMessageBoxSync(mainWindow, {
       type: 'question',
       buttons: ['Yes', 'No'],
       title: 'Confirm',
       message: 'Are you sure you want to close the application?'
+
+      
     })
+
+
     if (choice === 1) {
       event.preventDefault()
     }
@@ -147,8 +256,8 @@ function createWindow() {
 
   
   mainWindow.webContents.openDevTools();
-}
 
+}
 
 
 app.whenReady().then(() => {
@@ -341,3 +450,63 @@ ipcMain.on('logError', (event, error) => {
   }
 });
 
+// app.on('before-quit', () => {
+//   // Run your cron job logic here
+//   console.log('Cron job started');
+
+//   const isElectronRunning = isProcessRunning('DentreadIMApp');
+//     // Electron application is not running, start counting time
+//     let timeSinceClosed = 0;
+//     const intervalId = setInterval(() => {
+//       timeSinceClosed += 1; // Increment time by 1 minute
+
+//       // Check if 2 minutes have passed since the app was closed
+//       if (timeSinceClosed >= 2 && !notificationSent) {
+//         // Send notification
+//         notifier.notify({
+//           title: 'App Notification',
+//           message: 'Your app needs attention!',
+//           sound: true,
+//           wait: true
+//         });
+//         notificationSent = true; // Mark notification as sent
+        
+//         // Stop the interval
+//         clearInterval(intervalId);
+//       }
+//     }, 60000); // 1 minute interval
+  
+//   console.log('Cron job ended');
+// });
+
+
+app.on('before-quit', () => {
+  function startNotificationProcess() {
+    const { spawn } = require('child_process');
+    const notificationProcess = spawn('node', ['notification.js'], {
+      detached: true,
+      stdio: ['ignore', 'ignore', 'ignore'], // Redirect stdio to prevent closing
+    });
+
+    // Detach the spawned process from the parent process
+    notificationProcess.unref();
+
+    // Handle any errors or output from the background process
+    notificationProcess.on('error', (error) => {
+      console.error(`Error starting notification process: ${error}`);
+    });
+
+    notificationProcess.on('exit', (code) => {
+      console.log(`Notification process exited with code ${code}`);
+      // Remove the PID file when the process exits
+      fs.unlinkSync(pidFilePath);
+    });
+
+    // Write the process PID to a file
+    notificationProcess.on('spawn', () => {
+      fs.writeFileSync(pidFilePath, notificationProcess.pid.toString());
+    });
+  }
+
+  startNotificationProcess();
+});
