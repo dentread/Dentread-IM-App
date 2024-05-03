@@ -173,7 +173,7 @@ function createWindow() {
   
                   notifier.notify({
                       title: 'Dentraed IM App Sync Update',
-                      message: `Successfully Synced ${totalCount} Scans.`,
+                      message: `Total Synced ${totalCount} Scans.`,
                       sound: true,
                       wait: true,
                       icon: path.join(__dirname, 'images/LogoDentread.png'),
@@ -185,7 +185,7 @@ function createWindow() {
           }
        
         try {
-          const intervalId = setInterval(updateNotification, 1 * 60 * 1000);}
+          const intervalId = setInterval(updateNotification, 1 * 60 * 60 * 1000);}
           catch (error) {
             console.error('Error in auto-update process:', error);
           }

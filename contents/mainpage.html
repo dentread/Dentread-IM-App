@@ -33,9 +33,9 @@
         <div class="container-fluid">
 
             <div class="form-check form-switch">
-                <h5 id="headermessage"></h5>
+                <!-- <h5 id="headermessage"></h5> -->
             </div>
-            <div class="col-sm-12 d-flex align-items-center">
+            <div class="col-sm-12 d-flex align-items-center justify-content-between">
                 <div class="col-md-6 selected-sync-show">
                     <h6>Sync Type: <span class="userShowSync" id="userShowSync"></span></h6>
                 </div>
@@ -135,7 +135,7 @@
             let actualValue = 'Manual Sync';
             if(storedPrefSyncOption && storedPrefSyncOption === 'scheduleSync'){
                 if (prefRadioValue && prefRadioValue === 'perpetualSchedule'){
-                    actualValue = 'Schedule Sync (Perpetuel)';
+                    actualValue = 'Schedule Sync (Perpetual)';
                 }else if(prefRadioValue && prefRadioValue === 'customSchedule'){
                     actualValue = 'Schedule Sync (Custom)';
                 }
@@ -182,8 +182,9 @@
             selectedButton.click();
         };
         
-
+        const delay = 30000;
         document.addEventListener("DOMContentLoaded", function() {
+            const buttonId = "";
             handleTheSyncState();
             setTimeout(function() {
                 simulateButtonClick(buttonId === "stageToSync" ? "syncToDentreadId" : "stageToSync", buttonId === "stageToSync" ? 120000 : 30000);
@@ -302,6 +303,46 @@ function runLogic() {
     });
 
     
+    </script>
+
+    <script>
+document.addEventListener("DOMContentLoaded", function() {
+    function updateProgressBar() {
+        const allStagedFiles = document.getElementById('allStagedFiles');
+        const progress = document.querySelector('.progress-bar');
+        const liElements = allStagedFiles.querySelectorAll('li');
+        const totalFileCount = liElements.length;
+        const uploadedFileCount = totalFileCount - allStagedFiles.querySelectorAll('.staged-file-remove').length;
+        let progressPercentage = 0;
+
+        // Calculate progress percentage
+        if (totalFileCount > 0) {
+            progressPercentage = (uploadedFileCount / totalFileCount) * 100;
+        } else {
+            progressPercentage = 100; // If there are no files, progress is 100%
+        }
+
+        // Update progress bar width
+        progress.style.width = progressPercentage + "%";
+        progress.innerText = Math.round(progressPercentage) + "%";
+    }
+
+    // Call updateProgressBar initially
+    updateProgressBar();
+
+    // Call updateProgressBar whenever files are updated
+    document.getElementById('stageToSync').addEventListener('click', updateProgressBar);
+
+    // Use MutationObserver to monitor changes in the DOM and update the progress bar accordingly
+    const observer = new MutationObserver(updateProgressBar);
+    const allStagedFiles = document.getElementById('allStagedFiles');
+    observer.observe(allStagedFiles, { childList: true });
+});
+
+
+
+
+
     </script>
 
     <script src="../node_modules/jquery/dist/jquery.min.js"></script>

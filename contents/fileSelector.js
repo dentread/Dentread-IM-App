@@ -377,14 +377,23 @@ scheduleButton.addEventListener('click', async () => {
 document.addEventListener('DOMContentLoaded', async() => {
     const storedPrefSyncOption = localStorage.getItem('prefSyncOption');
     if(storedPrefSyncOption && storedPrefSyncOption === 'scheduleSync'){
-        document.getElementById('headermessage').textContent = 'Autosync is running...';
-        document.getElementById('headermessage').style.color = 'green';
+        // document.getElementById('headermessage').textContent = 'Autosync is running...';
+        // document.getElementById('headermessage').style.color = 'green';
         await window.versions.minimizeWindow();
     }else{
-        document.getElementById('headermessage').textContent = 'Autosync Disabled';
-        document.getElementById('headermessage').style.color = 'red';
+        // document.getElementById('headermessage').textContent = 'Autosync Disabled';
+        // document.getElementById('headermessage').style.color = 'red';
+        localStorage.setItem('prefSyncOption', 'manualSync');
         await window.versions.minimizeWindow2();
     }
+});
+
+
+const manualButton = document.getElementById('manualSyncBtn');
+manualButton.addEventListener('click', async () => {
+    // document.getElementById('headermessage').textContent = 'Autosync Disabled';
+    // document.getElementById('headermessage').style.color = 'red';
+    localStorage.setItem('prefSyncOption', 'manualSync');
 });
 
 
