@@ -407,6 +407,7 @@ function createCustomScheduler() {
 
   customSchedule.on('closed', () => {
     customSchedule = null;
+    mainWindow.reload();
   });
   customSchedule.webContents.openDevTools();
 }
