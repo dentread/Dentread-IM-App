@@ -147,7 +147,9 @@
             const storedPrefSyncOption = localStorage.getItem('prefSyncOption');
             const prefRadioValue = localStorage.getItem('prefRadioValue')
             if(storedPrefSyncOption && storedPrefSyncOption === 'scheduleSync'){
-                return true;
+                if(prefRadioValue && prefRadioValue === 'perpetualSchedule'){
+                    return true;
+                }
             }else{
                 return false;
             }
