@@ -71,7 +71,7 @@
                     <h6 class="m-0">Data Syncing</h6>
                 </div>
                 <div class="upload-status-body col-md-6 text-end">
-                    <button class="btn dentread-button ml-auto active-button-identify" id="manualSyncBtn">Manual Sync</button>
+                    <button class="btn dentread-button ml-auto" id="manualSyncBtn">Manual Sync</button>
                     <button class="btn dentread-button ml-auto" id="scheduleSyncBtn">Schedule Sync</button>
                 </div>
                 <div class="upload-progress-bar col-md-12 pt-3">
@@ -273,6 +273,29 @@ function runLogic() {
 
     startCheckingMatchTime();
 });
+
+    const manualSyncBtn = document.getElementById('manualSyncBtn');
+    const scheduleSyncBtn = document.getElementById('scheduleSyncBtn');
+    manualSyncBtn.addEventListener('click', ()=>{
+        let prefSyncOption = 'manualSync';
+        if(!manualSyncBtn.classList.contains('active-button-identify')){
+            manualSyncBtn.classList.add('active-button-identify')
+        }
+        if(scheduleSyncBtn.classList.contains('active-button-identify')){
+            scheduleSyncBtn.classList.remove('active-button-identify')
+        }
+        localStorage.setItem('prefSyncOption', prefSyncOption);
+    })
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const storedPrefSyncOption = localStorage.getItem('prefSyncOption');
+        if (storedPrefSyncOption && storedPrefSyncOption === 'manualSync') {
+            manualSyncBtn.classList.add('active-button-identify');
+        };
+        if (storedPrefSyncOption && storedPrefSyncOption === 'scheduleSync'){
+            scheduleSyncBtn.classList.add('active-button-identify');
+        }
+    });
 
     
     </script>

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Schedular</title>
+    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.css">
+    <link rel="stylesheet" href="../assets/schedular.css">
+</head>
+<body>
+    <div class="main-content mt-1">
+        <div class="container-fluid">
+            <div class="col-sm-12 schedule-heading">
+                <h6 class="spcial-font">Schedule Type</h6>
+            </div>
+            <div class="col-sm-12 schedule-select">
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="scheduleType" id="perpetualSchedule" value="perpetualSchedule" checked>
+                    <label class="form-check-label" for="perpetualSchedule">
+                        <span class="spcial-font">Perpetual</span> (Scheduler syncs every 5 mins)
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="scheduleType" id="customSchedule" value="customSchedule">
+                    <label class="form-check-label" for="customSchedule">
+                        <span class="spcial-font">Custom</span> (Scheduled to sync image as per your business need)
+                    </label>
+                </div>
+                <div class="col-12 mt-2 weak-listing" id="weak-listing" onclick="onWeekParentClick(event)">
+                    <div class="form-group">
+                        <input type="checkbox" class="d-none" name="Mon" value="Mon" id="MonCheck">
+                        <label for="MonCheck" class="week-check">M</label>
+                    </div>
+                    <div class="form-group">
+                        <input type="checkbox" class="d-none" name="Tue" value="Tue" id="TueCheck">
+                        <label for="TueCheck" class="week-check">T</label>
+                    </div>
+                    <div class="form-group">
+                        <input type="checkbox" class="d-none" name="Wed" value="Wed" id="WedCheck">
+                        <label for="WedCheck" class="week-check">W</label>
+                    </div>
+                    <div class="form-group">
+                        <input type="checkbox" class="d-none" name="Thu" value="Thu" id="ThuCheck">
+                        <label for="ThuCheck" class="week-check">T</label>
+                    </div>
+                    <div class="form-group">
+                        <input type="checkbox" class="d-none" name="Fri" value="Fri" id="FriCheck">
+                        <label for="FriCheck" class="week-check">F</label>
+                    </div>
+                    <div class="form-group">
+                        <input type="checkbox" class="d-none" name="Sat" value="Sat" id="SatCheck">
+                        <label for="SatCheck" class="week-check">S</label>
+                    </div>
+                    <div class="form-group">
+                        <input type="checkbox" class="d-none" name="Sun" value="Sun" id="SunCheck">
+                        <label for="SunCheck" class="week-check">S</label>
+                    </div>
+                </div>
+                <div class="form-group col-md-2 mt-2 w-50 time-section" id="time-section">
+                    <label for="startTime" class="spcial-font">Start Time</label>
+                    <input type="time" class="form-control w-50 dentread-button mt-1" value="06:30" name="startTime" id="startTime">
+                </div>                
+            </div>
+            <div class="col-sm-12 store-schedule text-end mt-4">
+                <button class="btn dentread-button active-button-identify" type="button" id="storeSchedulePref">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const radioButtons = document.querySelectorAll('input[name="scheduleType"]');
+        radioButtons.forEach(radioButton => {
+            radioButton.addEventListener('click', function() {
+                const selectedValue = this.value;
+                const weakListing = document.getElementById('weak-listing');
+                const timeSelection = document.getElementById('time-section');
+                if (selectedValue === 'customSchedule') {
+                    weakListing.style.display = 'flex';
+                    if(timeSelection.classList.contains('d-none')){
+                        timeSelection.classList.remove('d-none')
+                    }
+                } else {
+                    weakListing.style.display = 'none';
+                    if(!timeSelection.classList.contains('d-none')){
+                        timeSelection.classList.add('d-none')
+                    }
+                }
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            //value needs to be put from server
+            let radioServerValue = 'customSchedule';
+
+            const weakListing = document.getElementById('weak-listing');
+            const timeSelection = document.getElementById('time-section');
+
+            const radioButtons = document.querySelectorAll('input[name="scheduleType"]');
+            radioButtons.forEach(radioButton => {
+                if (radioButton.value === radioServerValue) {
+                    radioButton.checked = true;
+                } else {
+                    radioButton.checked = false;
+                }
+            });
+            if (radioServerValue === 'customSchedule') {
+                weakListing.style.display = 'flex';
+                if(timeSelection.classList.contains('d-none')){
+                    timeSelection.classList.remove('d-none')
+                }
+            } else {
+                weakListing.style.display = 'none';
+                if(!timeSelection.classList.contains('d-none')){
+                    timeSelection.classList.add('d-none')
+                }
+            }
+        });
+        
+        
+        //value needs to be put from server
+        let selectedWeekValues = [true, true, true, true, true, false, false];
+        function onWeekParentClick(ev){
+            let clickedElement = ev.target;
+            if(clickedElement.nodeName === 'LABEL'){
+                clickedElement.classList.toggle('active');
+                let index = Array.from(clickedElement.parentElement.parentElement.children).indexOf(clickedElement.parentElement);
+                selectedWeekValues[index] = !selectedWeekValues[index];
+            }
+        };
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            //value needs to be put from server
+            let selectedWeekList = [true, true, true, true, true, false, false];
+        
+            const checkboxes = document.querySelectorAll('.weak-listing input[type="checkbox"]');
+            const labels = document.querySelectorAll('.weak-listing .week-check');
+        
+            checkboxes.forEach((checkbox, index) => {
+                checkbox.checked = selectedWeekList[index];
+            });
+        
+            labels.forEach((label, index) => {
+                if (selectedWeekList[index]) {
+                    label.classList.add('active');
+                } else {
+                    label.classList.remove('active');
+                }
+            });
+        });
+        document.getElementById('storeSchedulePref').addEventListener('click', () => {
+            let radioButtonsValue;
+            let prefWeekValue = selectedWeekValues;
+            let scheduleTime = document.getElementById('startTime').value
+            const schedulePrefButtons = document.querySelectorAll('input[name="scheduleType"]');
+            schedulePrefButtons.forEach(radioButton => {
+                if (radioButton.checked) {
+                    radioButtonsValue = radioButton.value;
+                }
+            });
+            let prefSyncOption = 'scheduleSync';
+            localStorage.setItem('prefSyncOption', prefSyncOption);
+            const scheduleSyncBtn = document.getElementById('scheduleSyncBtn');
+            
+            console.log('radioButtonsValue', radioButtonsValue);
+            console.log('prefWeekValue', prefWeekValue);
+            console.log('scheduleTime', scheduleTime);
+            scheduleSyncBtn.classList.toggle('active-button-identify');
+        });
+               
+    </script>
+
+    <script src="../node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>  
+</html>
