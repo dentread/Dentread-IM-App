@@ -417,4 +417,14 @@ ipcMain.handle('open-scheduler', () => {
     createCustomScheduler();
   }
   return true;
+
+
+});
+
+
+
+ipcMain.handle('open-reload-manual', () => {
+  mainWindow.reload();
+  return true;
+
 });

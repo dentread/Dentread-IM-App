@@ -334,6 +334,12 @@ contextBridge.exposeInMainWorld('versions', {
     ipcRenderer.invoke('open-scheduler');
 },
 
+
+manualbuttonfunc: async () => {
+
+
+  ipcRenderer.invoke('open-reload-manual');
+},
   minimizeWindow2: async () => {
     function sendTestNotification() {
       setTimeout(function() {
