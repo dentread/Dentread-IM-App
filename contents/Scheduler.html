@@ -132,6 +132,45 @@
         
         document.addEventListener('DOMContentLoaded', () => {
             //value needs to be put from server
+
+
+    const storedDictString = localStorage.getItem('hostname_time');
+    const hostname = localStorage.getItem('hostname');
+
+    // Check if the dictionary exists in local storage
+    if (storedDictString) {
+        try {
+            // Parse the stored string into a JavaScript object
+            const storedDict = JSON.parse(storedDictString);
+            
+            // Retrieve the value of the specific key (startTime)
+            const storedStartTime = storedDict[hostname];
+
+            // Check if the startTime value exists
+            if (storedStartTime) {
+                // Set the value of the input element with id 'startTime'
+                document.getElementById('startTime').value = storedStartTime;
+            } else {
+                // If the startTime value doesn't exist, set a default value
+                document.getElementById('startTime').value = '06:30';
+            }
+        } catch (error) {
+            // Handle JSON parsing error
+            console.error('Error parsing stored dictionary:', error);
+            // Set a default value
+            document.getElementById('startTime').value = '06:30';
+        }
+    } else {
+        // If the dictionary doesn't exist in local storage, set a default value
+        document.getElementById('startTime').value = '06:30';
+    }
+
+
+
+
+
+
+
             let selectedWeekList = [true, true, true, true, true, false, false];
         
             const checkboxes = document.querySelectorAll('.weak-listing input[type="checkbox"]');
@@ -162,7 +201,66 @@
             let prefSyncOption = 'scheduleSync';
             localStorage.setItem('prefSyncOption', prefSyncOption);
             localStorage.setItem('prefRadioValue', radioButtonsValue);
+
+
+      
+    // Create FormData object to hold form data
+    const formData = new FormData();
+    formData.append('REMOTE_ADDR', localStorage.getItem('hostname'));
+    formData.append('time', scheduleTime);
+
+    // Retrieve authorization token from local storage
+    const authTokenString = localStorage.getItem('token');
+
+    // Check if authToken exists in local storage
+    if (!authTokenString) {
+        console.error('Authorization token not found in local storage');
+        return; // Exit function early if token is missing
+    }
+
+    try {
+        // Parse the authToken string as JSON
+        const authToken = JSON.parse(authTokenString);
+
+        // Extract the value corresponding to the desired key
+        const tokenValue = authToken['access'];
+
+        // Send POST request to the API endpoint
+        fetch('http://testapi.dentread.com/schedule/', {
+            method: 'POST',
+            headers: {
+                // Authorization header with token value
+                'Authorization': `Bearer ${tokenValue}`
+            },
+            body: formData
+        })
+        .then(response => {
+            console.log('Response Status:', response.status);
+            const hostname = localStorage.getItem('hostname')
+
+            const data = {
+                [hostname]: scheduleTime,
+
+            };
+
+            const jsonData = JSON.stringify(data);
+
+            localStorage.setItem('hostname_time', jsonData);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Response from server:', data);
+        })
+        .catch(error => {
+            console.error('Error:', error);
         });
+    } catch (error) {
+        console.error('Error parsing authorization token:', error);
+    }
+});
                
     </script>
 
