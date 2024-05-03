@@ -373,25 +373,20 @@ scheduleButton.addEventListener('click', async () => {
 });
 
 
-const autosyncminimize = document.getElementById('onoffsync');
 
-autosyncminimize.addEventListener('click', async () => {
-    if (autosyncminimize.checked) {
-        // Run the code only if the checkbox is checked
+document.addEventListener('DOMContentLoaded', async() => {
+    const storedPrefSyncOption = localStorage.getItem('prefSyncOption');
+    if(storedPrefSyncOption && storedPrefSyncOption === 'scheduleSync'){
         document.getElementById('headermessage').textContent = 'Autosync is running...';
         document.getElementById('headermessage').style.color = 'green';
-
         await window.versions.minimizeWindow();
-    }
-    else {
-        // If unchecked, send false to the main process
+    }else{
         document.getElementById('headermessage').textContent = 'Autosync Disabled';
         document.getElementById('headermessage').style.color = 'red';
-
         await window.versions.minimizeWindow2();
     }
-
 });
+
 
 const logButton = document.getElementById('log');
 logButton.addEventListener('click', async () => {

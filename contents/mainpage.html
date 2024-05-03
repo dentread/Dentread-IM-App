@@ -31,17 +31,19 @@
 <body>
     <div class="main-content">
         <div class="container-fluid">
+
             <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" id="onoffsync">
-                <label class="form-check-label" for="onoffsync">Auto/Sync</label>
                 <h5 id="headermessage"></h5>
-                
             </div>
-            
-            <div class="col-sm-12 logout-header">
-                <button class="btn settings-button dentread-button button ml-auto" id="log"><i class="fas fa-info-circle"></i> Logs</button>
-                <button class="btn settings-button dentread-button ml-auto" id="settingsButton"><i class="fa fa-cog" aria-hidden="true"></i> Settings</button>
-                <button class="btn logout-button ml-auto" id="logoutbutton"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            <div class="col-sm-12 d-flex align-items-center">
+                <div class="col-md-6 selected-sync-show">
+                    <h6>Sync Type: <span class="userShowSync" id="userShowSync"></span></h6>
+                </div>
+                <div class="col-md-6 logout-header">
+                    <button class="btn settings-button dentread-button ml-auto" id="log"><i class="fas fa-info-circle"></i> Logs</button>
+                    <button class="btn settings-button dentread-button ml-auto" id="settingsButton"><i class="fa fa-cog" aria-hidden="true"></i> Settings</button>
+                    <button class="btn logout-button ml-auto" id="logoutbutton"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                </div>
             </div>
             <div class="col-sm-12 col-lg-12 col-xl-12 mb-5">
                 <div class="row row-sm  mt-lg-4">
@@ -126,15 +128,30 @@
         </div>
     </div>
     <script>
- document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function() {
+            const storedPrefSyncOption = localStorage.getItem('prefSyncOption');
+            const prefRadioValue = localStorage.getItem('prefRadioValue');
+            const userShowSync = document.getElementById('userShowSync');
+            let actualValue = 'Manual Sync';
+            if(storedPrefSyncOption && storedPrefSyncOption === 'scheduleSync'){
+                if (prefRadioValue && prefRadioValue === 'perpetualSchedule'){
+                    actualValue = 'Schedule Sync (Perpetuel)';
+                }else if(prefRadioValue && prefRadioValue === 'customSchedule'){
+                    actualValue = 'Schedule Sync (Custom)';
+                }
+            }
+            userShowSync.innerText = actualValue;
+        });
+
         function isButtonOn() {
             const storedPrefSyncOption = localStorage.getItem('prefSyncOption');
+            const prefRadioValue = localStorage.getItem('prefRadioValue')
             if(storedPrefSyncOption && storedPrefSyncOption === 'scheduleSync'){
-                return true; 
+                return true;
             }else{
-                return false
+                return false;
             }
-        }
+        };
 
         function disableButton(disable) {
             const stageButton = document.getElementById("stageToSync");
@@ -143,31 +160,12 @@
             stageButton.style.pointerEvents = disable ? "none" : "auto";
             suncToDtrdBtn.style.opacity = disable ? "0" : "1";
             suncToDtrdBtn.style.pointerEvents = disable ? "none" : "auto";
-        }
+        };
 
-
-        if (isButtonOn()) {
-            const stgSyncBtn = document.getElementById("stageToSync");
-            stgSyncBtn.click();
-            setTimeout(function() {
-                simulateButtonClick("syncToDentreadId", 30000);
-            }, 30000);
-            disableButton(true);
-        }
-    
-        function f(buttonId, delay) {
-            let selectedButton = document.getElementById(buttonId);
-    
-            selectedButton.click();
-            setTimeout(function() {
-                simulateButtonClick(buttonId === "stageToSync" ? "syncToDentreadId" : "stageToSync", buttonId === "stageToSync" ? 120000 : 30000);
-            }, delay);
-        }
-
-        document.getElementById("onoffsync").addEventListener("change", function() {
+        function handleTheSyncState(){
             if (isButtonOn()) {
-                var button = document.getElementById("stageToSync");
-                button.click();
+                const stageSyncButton = document.getElementById("stageToSync");
+                stageSyncButton.click();
                 setTimeout(function() {
                     simulateButtonClick("syncToDentreadId", 30000);
                 }, 30000);
@@ -176,9 +174,19 @@
             else{
                 disableButton(false);
             }
+        };
+        function simulateButtonClick(buttonId, delay) {
+            let selectedButton = document.getElementById(buttonId);
+            selectedButton.click();
+        };
+        
 
+        document.addEventListener("DOMContentLoaded", function() {
+            handleTheSyncState();
+            setTimeout(function() {
+                simulateButtonClick(buttonId === "stageToSync" ? "syncToDentreadId" : "stageToSync", buttonId === "stageToSync" ? 120000 : 30000);
+            }, delay);
         });
-    });
 
 
     document.addEventListener("DOMContentLoaded", function() {
@@ -278,6 +286,7 @@ function runLogic() {
             scheduleSyncBtn.classList.remove('active-button-identify')
         }
         localStorage.setItem('prefSyncOption', prefSyncOption);
+        handleTheSyncState();
     })
 
     document.addEventListener('DOMContentLoaded', () => {
