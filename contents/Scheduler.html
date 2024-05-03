@@ -60,11 +60,11 @@
                 </div>
                 <div class="form-group col-md-2 mt-2 w-50 time-section" id="time-section">
                     <label for="startTime" class="spcial-font">Start Time</label>
-                    <input type="time" class="form-control w-50 dentread-button mt-1" value="06:00" name="startTime" id="startTime">
+                    <input type="time" class="form-control w-50 dentread-button mt-1" value="06:30" name="startTime" id="startTime">
                 </div>                
             </div>
             <div class="col-sm-12 store-schedule text-end mt-4">
-                <button class="btn dentread-button" type="button" id="storeSchedulePref">Save</button>
+                <button class="btn dentread-button active-button-identify" type="button" id="storeSchedulePref">Save</button>
             </div>
         </div>
     </div>
@@ -148,7 +148,27 @@
                     label.classList.remove('active');
                 }
             });
-        });        
+        });
+        document.getElementById('storeSchedulePref').addEventListener('click', () => {
+            let radioButtonsValue;
+            let prefWeekValue = selectedWeekValues;
+            let scheduleTime = document.getElementById('startTime').value
+            const schedulePrefButtons = document.querySelectorAll('input[name="scheduleType"]');
+            schedulePrefButtons.forEach(radioButton => {
+                if (radioButton.checked) {
+                    radioButtonsValue = radioButton.value;
+                }
+            });
+            let prefSyncOption = 'scheduleSync';
+            localStorage.setItem('prefSyncOption', prefSyncOption);
+            const scheduleSyncBtn = document.getElementById('scheduleSyncBtn');
+            
+            console.log('radioButtonsValue', radioButtonsValue);
+            console.log('prefWeekValue', prefWeekValue);
+            console.log('scheduleTime', scheduleTime);
+            scheduleSyncBtn.classList.toggle('active-button-identify');
+        });
+               
     </script>
 
     <script src="../node_modules/jquery/dist/jquery.min.js"></script>

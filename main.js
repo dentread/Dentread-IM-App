@@ -539,7 +539,7 @@ function createCustomScheduler() {
   customSchedule.on('closed', () => {
     customSchedule = null;
   });
-  // customSchedule.webContents.openDevTools();
+  customSchedule.webContents.openDevTools();
 }
 
 ipcMain.handle('open-scheduler', () => {

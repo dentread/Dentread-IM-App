@@ -67,3 +67,11 @@ body::-webkit-scrollbar-thumb:hover {
 .spcial-font{
     font-weight: 600;
 }
+.active-button-identify{
+    color: white;
+    background-color: #0076CC;
+  }
+  .active-button-identify:hover {
+    color: white !important;
+    background-color: #0076CC !important;
+  }
