@@ -127,46 +127,43 @@
     </div>
     <script>
  document.addEventListener("DOMContentLoaded", function() {
-
-
         function isButtonOn() {
-            var button = document.getElementById("onoffsync");
-
-            return button.checked; 
+            const storedPrefSyncOption = localStorage.getItem('prefSyncOption');
+            if(storedPrefSyncOption && storedPrefSyncOption === 'scheduleSync'){
+                return true; 
+            }else{
+                return false
+            }
         }
+
         function disableButton(disable) {
-        var button = document.getElementById("stageToSync");
-        var button2 = document.getElementById("syncToDentreadId");
-        button.style.opacity = disable ? "0" : "1";
-        button.style.pointerEvents = disable ? "none" : "auto";
-        button2.style.opacity = disable ? "0" : "1";
-        button2.style.pointerEvents = disable ? "none" : "auto";
+            const stageButton = document.getElementById("stageToSync");
+            const suncToDtrdBtn = document.getElementById("syncToDentreadId");
+            stageButton.style.opacity = disable ? "0" : "1";
+            stageButton.style.pointerEvents = disable ? "none" : "auto";
+            suncToDtrdBtn.style.opacity = disable ? "0" : "1";
+            suncToDtrdBtn.style.pointerEvents = disable ? "none" : "auto";
         }
 
 
         if (isButtonOn()) {
-            var button = document.getElementById("stageToSync");
-
-            button.click();
-
+            const stgSyncBtn = document.getElementById("stageToSync");
+            stgSyncBtn.click();
             setTimeout(function() {
                 simulateButtonClick("syncToDentreadId", 30000);
             }, 30000);
             disableButton(true);
-
         }
     
         function f(buttonId, delay) {
-            var button = document.getElementById(buttonId);
+            let selectedButton = document.getElementById(buttonId);
     
-            button.click();
-    
-            console.log(buttonId + " click completed.");
-    
+            selectedButton.click();
             setTimeout(function() {
                 simulateButtonClick(buttonId === "stageToSync" ? "syncToDentreadId" : "stageToSync", buttonId === "stageToSync" ? 120000 : 30000);
             }, delay);
         }
+
         document.getElementById("onoffsync").addEventListener("change", function() {
             if (isButtonOn()) {
                 var button = document.getElementById("stageToSync");
@@ -185,12 +182,8 @@
 
 
     document.addEventListener("DOMContentLoaded", function() {
-    // Function to retrieve time from local storage
     function getStoredTime(hostname) {
-    // Retrieve the dictionary string from local storage
     const dictionaryString = localStorage.getItem('hostname_time');
-    
-    // Parse the dictionary string into a JavaScript object
     const dictionary = JSON.parse(dictionaryString);
 
     if (dictionary && typeof dictionary === 'object') {
