@@ -517,7 +517,6 @@ function Scheduleevent() {
             })
             .then(response => {
                 if (response.ok) {
-                    print(response,"response")
                     return response.json();
                 } else {
                     console.error('API request error:', response.statusText);
