@@ -368,6 +368,7 @@ settingsButton.addEventListener('click', async () => {
 
 const scheduleButton = document.getElementById('scheduleSyncBtn');
 scheduleButton.addEventListener('click', async () => {
+    await Scheduleevent();
     await window.versions.schedulerbuttonfunc();
 });
 
@@ -498,7 +499,7 @@ function fetchData() {
 
 function Scheduleevent() {
     const token = JSON.parse(localStorage.getItem('token'));
-    let acces_token= token.access;
+    let access_token = token.access;
 
     if (!token) {
         console.error('Token not available. Redirecting to login page...');
@@ -508,35 +509,39 @@ function Scheduleevent() {
         const apiUrl = 'http://testapi.dentread.com/getschedule/';
 
         fetch(apiUrl, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${acces_token}`,
-                'Content-Type': 'application/json',
-            },
-        })
-        .then(response => {
-            if (response.ok) {
-                return response.json();
-            } else {
-                console.error('API request error:', response.statusText);
-            }
-        })
-        .then(data => {
-            const times = [];
-            const ips = [];
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${access_token}`,
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => {
+                if (response.ok) {
+                    print(response,"response")
+                    return response.json();
+                } else {
+                    console.error('API request error:', response.statusText);
+                    throw new Error('Failed to fetch schedule data');
+                }
+            })
+            .then(data => {
+                if (data.length === 0) {
+                    console.warn('No schedule data available.');
+                } else {
+                    const scheduleData = {}; // Object to store schedule data
 
-            data.forEach(item => {
-                times.push(item.time);
-                ips.push(item.ip);
+                    data.forEach(item => {
+                        // Assign hostname as the value for each time key
+                        scheduleData[item.hostname] = item.time;
+                    });
+
+                    localStorage.setItem('hostname_time', JSON.stringify(scheduleData));
+                }
+            })
+            .catch(error => {
+                console.error('API request error:', error.message);
+                // Handle the error, such as displaying an error message to the user
             });
 
-            localStorage.setItem('time', JSON.stringify(times));
-            localStorage.setItem('ip', JSON.stringify(ips));
-        })
-        .catch(error => {
-            console.error('API request error:', error.message);
-        });
-    
     }
 };
-

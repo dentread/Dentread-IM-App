@@ -156,7 +156,7 @@
 
         }
     
-        function simulateButtonClick(buttonId, delay) {
+        function f(buttonId, delay) {
             var button = document.getElementById(buttonId);
     
             button.click();
@@ -182,6 +182,97 @@
 
         });
     });
+
+
+    document.addEventListener("DOMContentLoaded", function() {
+    // Function to retrieve time from local storage
+    function getStoredTime(hostname) {
+    // Retrieve the dictionary string from local storage
+    const dictionaryString = localStorage.getItem('hostname_time');
+    
+    // Parse the dictionary string into a JavaScript object
+    const dictionary = JSON.parse(dictionaryString);
+
+    if (dictionary && typeof dictionary === 'object') {
+        if (hostname in dictionary) {
+            console.log(dictionary[hostname])
+            return dictionary[hostname];
+        } else {
+           
+            return null;
+        }
+    } else {
+        return null;
+    }
+}
+
+    function isMatchTime(storedTime) {
+        const currentTime = new Date();
+        const storedHour = parseInt(storedTime.split(':')[0], 10);
+        const storedMinute = parseInt(storedTime.split(':')[1], 10);
+
+        console.log('currentTime',currentTime.getHours(),currentTime.getMinutes(), storedHour, storedMinute)
+
+        return currentTime.getHours() === storedHour && currentTime.getMinutes() === storedMinute;
+    }
+
+    function calculateTimeDifference(storedTime) {
+    const currentTime = new Date();
+    const storedHour = parseInt(storedTime.split(':')[0], 10);
+    const storedMinute = parseInt(storedTime.split(':')[1], 10);
+
+    const currentHour = currentTime.getHours();
+    const currentMinute = currentTime.getMinutes();
+
+    let hourDifference = storedHour - currentHour;
+    let minuteDifference = storedMinute - currentMinute;
+
+    if (hourDifference < 0) {
+        hourDifference += 24;
+    }
+
+    if (minuteDifference < 0) {
+        minuteDifference += 60;
+        hourDifference--;
+
+    return {
+        hours: hourDifference,
+        minutes: minuteDifference
+    };
+}
+    }
+
+function runLogic() {
+    var button = document.getElementById("stageToSync");
+    button.click();
+    console.log("stageToSync click completed.");
+
+    setTimeout(function() {
+        var button = document.getElementById("syncToDentreadId");
+        button.click();
+        console.log("syncToDentreadId click completed.");
+
+        setTimeout(runLogic, 5 * 60 * 1000);
+    }, 30 * 1000); 
+}
+
+
+    function startCheckingMatchTime() {
+        const hostname = localStorage.getItem('hostname');
+        const storedTime = getStoredTime(hostname);
+
+        if (storedTime) {
+            if (isMatchTime(storedTime)) {
+                runLogic();
+            } else {
+                const timeDifference = calculateTimeDifference(storedTime);
+                setTimeout(startCheckingMatchTime, 60000);
+            }
+        }
+    }
+
+    startCheckingMatchTime();
+});
 
     
     </script>

@@ -97,7 +97,6 @@ contextBridge.exposeInMainWorld('versions', {
       if (!fs.existsSync(directoryPath)) {
         fs.mkdirSync(directoryPath, { recursive: true });
   
-        // Set permissions for the directory and its contents
         fs.chmodSync(directoryPath, 0o777);
         setDirectoryPermissions(directoryPath, 0o777);
   
@@ -194,12 +193,11 @@ contextBridge.exposeInMainWorld('versions', {
           if (fs.statSync(sourceItemPath).isDirectory()) {
             const folderNamesSet = new Set(JSON.parse(localStorage.getItem('folderNames')));
             if (!folderNamesSet.has(item)) {
-              // Create a zip file for the folder if it's not already a zip
               if (!item.endsWith('.zip')) {
                 const zipFileName = item + '.zip';
                 const output = fs.createWriteStream(path.join(destinationDirectory, zipFileName));
                 const archive = archiver('zip', {
-                  zlib: { level: 9 } // Sets the compression level
+                  zlib: { level: 9 }
                 });
                 output.on('close', () => {
                   totalCopied++;
@@ -207,7 +205,7 @@ contextBridge.exposeInMainWorld('versions', {
 
                  
 
-                  processNextItem(); // Continue with the next item
+                  processNextItem();
                 });
                 archive.pipe(output);
                 archive.directory(sourceItemPath, false);
@@ -216,14 +214,13 @@ contextBridge.exposeInMainWorld('versions', {
                 processNextItem();
               }
             } else {
-              processNextItem(); // Continue with the next item
+              processNextItem();
             }
           } else {
             const fileExtension = path.extname(item).toLowerCase();
             if (fileExtensions.includes(fileExtension)) {
               const filenameSet = new Set(JSON.parse(localStorage.getItem('filenames')));
               if (!filenameSet.has(item)) {
-                // Check if the file is already a zip, if not, copy it
                 fs.copyFileSync(sourceItemPath, destinationItemPath);
                 totalCopied++;
                 console.log(`At [${currentTime}] Copied folder: ${sourceItemPath} to ${destinationItemPath}`);
@@ -232,7 +229,7 @@ contextBridge.exposeInMainWorld('versions', {
               }
             } else {
             }
-            processNextItem(); // Continue with the next item
+            processNextItem();
           }
         }
     
@@ -322,19 +319,20 @@ contextBridge.exposeInMainWorld('versions', {
     logButtonfunc: async () => {
       ipcRenderer.invoke('open-logs')
       },
-      // sendLogsToMain: async(logs) => {
-      //   console.log("preload func called")
-      //   ipcRenderer.send('download-logs', logs);
-    // },
+
     minimizeWindow: async () => {
       const syncedFoldersJSON = localStorage.getItem('folderNames');
-      ipcRenderer.send('toggle-auto-sync', true, syncedFoldersJSON); // Send message to main process to minimize window
+      ipcRenderer.send('toggle-auto-sync', true, syncedFoldersJSON); 
   },
 
-
   schedulerbuttonfunc: async () => {
-    ipcRenderer.invoke('open-scheduler')
-    },
+    const os = require('os');
+    const hostname = os.hostname();
+
+    localStorage.setItem('hostname', hostname);
+
+    ipcRenderer.invoke('open-scheduler');
+},
 
   minimizeWindow2: async () => {
     function sendTestNotification() {
@@ -347,12 +345,11 @@ contextBridge.exposeInMainWorld('versions', {
           icon: path.join(__dirname, 'images/LogoDentread.png'),
 
         });
-      }, 300000); // 1 minute in milliseconds
+      }, 300000); 
     }
     
-    // Call the function to send the notification after 1 minute
     const intervalId = sendTestNotification();
-    ipcRenderer.send('toggle-auto-sync', false); // Send message to main process to minimize window
+    ipcRenderer.send('toggle-auto-sync', false);
 },
 
 

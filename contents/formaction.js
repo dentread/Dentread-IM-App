@@ -84,6 +84,7 @@ loginForm.addEventListener('submit', async (event) => {
                     localStorage.removeItem('savedPassword');
                 }
 
+
                 window.location.href = 'mainpage.html';
             } else {
                 doSomething('Authentication failed');
@@ -101,5 +102,6 @@ loginForm.addEventListener('submit', async (event) => {
 
     xhr.send(formData);
 });
+
 
 

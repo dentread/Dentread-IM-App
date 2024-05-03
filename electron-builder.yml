@@ -5,7 +5,7 @@ directories:
 files:
   - "**/*"
   - "notification.js"
-  - "notificationProcess.pid"
+  - "images/LogoDentread.png"
 
 extraResources:
   - assets/**

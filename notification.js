@@ -14,7 +14,6 @@ function isProcessRunning(processName) {
 
 function sendNotificationIfAppNotRunning() {
   const isElectronRunning = isProcessRunning('DentreadIMApp');
-  console.log(isElectronRunning)
   if (!isElectronRunning) {
     notifier.notify({
       title: 'IM App Notification',

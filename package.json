@@ -12,6 +12,11 @@
     "provider": "github",
     "releaseType": "release"
   },
+  "nsis": {
+    "oneClick": false,
+    "perMachine": true,
+    "allowToChangeInstallationDirectory": true
+  },
   "build": {
     "appId": "com.dentread.Imapp",
     "win": {
@@ -24,8 +29,14 @@
     "files": [
       "**/*",
       "notification.js",
-      "notificationProcess.pid"
+      "notificationProcess.pid",
+      "images/LogoDentread.png"
     ],
+    "extraResources": [
+      "assets/**",
+      "images/**"
+    ],
+    "asar": true,
     "icon": "images/LogoDentread.png"
   },
   "productName": "DentreadIMApp",
