@@ -383,7 +383,6 @@ document.addEventListener('DOMContentLoaded', async() => {
     }else{
         // document.getElementById('headermessage').textContent = 'Autosync Disabled';
         // document.getElementById('headermessage').style.color = 'red';
-        localStorage.setItem('prefSyncOption', 'manualSync');
         await window.versions.minimizeWindow2();
     }
 });

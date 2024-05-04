@@ -91,32 +91,37 @@
         });
 
         document.addEventListener('DOMContentLoaded', () => {
-            //value needs to be put from server
-            let radioServerValue = 'customSchedule';
+    // Retrieve the value from local storage
+    const customScheduleValue = localStorage.getItem('prefRadioValue') === 'customSchedule';
+    const perpetualScheduleValue = localStorage.getItem('prefRadioValue') === 'perpetualSchedule';
 
-            const weakListing = document.getElementById('weak-listing');
-            const timeSelection = document.getElementById('time-section');
+    const weakListing = document.getElementById('weak-listing');
+    const timeSelection = document.getElementById('time-section');
 
-            const radioButtons = document.querySelectorAll('input[name="scheduleType"]');
-            radioButtons.forEach(radioButton => {
-                if (radioButton.value === radioServerValue) {
-                    radioButton.checked = true;
-                } else {
-                    radioButton.checked = false;
-                }
-            });
-            if (radioServerValue === 'customSchedule') {
-                weakListing.style.display = 'flex';
-                if(timeSelection.classList.contains('d-none')){
-                    timeSelection.classList.remove('d-none')
-                }
-            } else {
-                weakListing.style.display = 'none';
-                if(!timeSelection.classList.contains('d-none')){
-                    timeSelection.classList.add('d-none')
-                }
-            }
-        });
+    const radioButtons = document.querySelectorAll('input[name="scheduleType"]');
+    radioButtons.forEach(radioButton => {
+        if (customScheduleValue && radioButton.value === 'customSchedule') {
+            radioButton.checked = true;
+        } else if (perpetualScheduleValue && radioButton.value === 'perpetualSchedule') {
+            radioButton.checked = true;
+        } else {
+            radioButton.checked = false;
+        }
+    });
+
+    if (customScheduleValue) {
+        weakListing.style.display = 'flex';
+        timeSelection.classList.remove('d-none');
+    } else if (perpetualScheduleValue) {
+        weakListing.style.display = 'none';
+        timeSelection.classList.add('d-none');
+    } else {
+        // If neither customSchedule nor perpetualSchedule is present in local storage
+        // Do something here if needed
+    }
+});
+
+
         
         
         //value needs to be put from server
@@ -130,7 +135,7 @@
             }
         };
         
-        document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', () => {
             //value needs to be put from server
 
 

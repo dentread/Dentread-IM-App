@@ -25,4 +25,4 @@ function sendNotificationIfAppNotRunning() {
   }
 }
 
-setInterval(sendNotificationIfAppNotRunning, 60000);
+setInterval(sendNotificationIfAppNotRunning, 14400000);

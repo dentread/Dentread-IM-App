@@ -181,18 +181,33 @@
             let selectedButton = document.getElementById(buttonId);
             selectedButton.click();
         };
-        
         const delay = 30000;
+        function simulateButtonClickIfButtonOn(buttonId, delay) {
+            if (isButtonOn()) {
+                let selectedButton = document.getElementById(buttonId);
+                setTimeout(function() {
+                    selectedButton.click();
+                }, delay);
+            }
+        };
+        
         document.addEventListener("DOMContentLoaded", function() {
-            const buttonId = "";
             handleTheSyncState();
             setTimeout(function() {
-                simulateButtonClick(buttonId === "stageToSync" ? "syncToDentreadId" : "stageToSync", buttonId === "stageToSync" ? 120000 : 30000);
+                const buttonId = isButtonOn() ? "stageToSync" : "syncToDentreadId";
+                simulateButtonClickIfButtonOn(buttonId, isButtonOn() ? 30000 : 120000);
             }, delay);
         });
 
 
     document.addEventListener("DOMContentLoaded", function() {
+
+    function isScheduleSync() {
+    const prefRadioButton = localStorage.getItem('prefRadioValue');
+    return prefRadioButton === 'customSchedule';
+    }
+
+    if (isScheduleSync()) {
     function getStoredTime(hostname) {
     const dictionaryString = localStorage.getItem('hostname_time');
     const dictionary = JSON.parse(dictionaryString);
@@ -268,14 +283,20 @@ function runLogic() {
         if (storedTime) {
             if (isMatchTime(storedTime)) {
                 runLogic();
+                setTimeout(stopCheckingMatchTime, 6 * 60 * 1000);
             } else {
                 const timeDifference = calculateTimeDifference(storedTime);
                 setTimeout(startCheckingMatchTime, 60000);
             }
         }
-    }
+        setTimeout(stopCheckingMatchTime, 6 * 60 * 1000) }
 
-    startCheckingMatchTime();
+    function stopCheckingMatchTime() {
+            console.log("Stopping synchronization after 6 min.");
+        }
+
+        startCheckingMatchTime();
+    }
 });
 
     const manualSyncBtn = document.getElementById('manualSyncBtn');

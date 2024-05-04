@@ -340,24 +340,29 @@ manualbuttonfunc: async () => {
 
   ipcRenderer.invoke('open-reload-manual');
 },
-  minimizeWindow2: async () => {
-    function sendTestNotification() {
-      setTimeout(function() {
-        notifier.notify({
-          title: 'Dentread IM App Auto Sync Notification',
-          message: 'This is to notify that auto sync is off',
-          sound: true,
-          wait: true,
-          icon: path.join(__dirname, 'images/LogoDentread.png'),
-
-        });
-      }, 300000); 
+minimizeWindow2: async () => {
+  function sendTestNotification() {
+    const localStorageValue = localStorage.getItem('prefSyncOption');
+    if (localStorageValue === 'manualSync') {
+      notifier.notify({
+        title: 'Dentread IM App Auto Sync Notification',
+        message: 'This is to notify that auto sync is off',
+        sound: true,
+        wait: true,
+        icon: path.join(__dirname, 'images/LogoDentread.png'),
+      });
     }
-    
-    const intervalId = sendTestNotification();
-    ipcRenderer.send('toggle-auto-sync', false);
-},
+  }
 
+  // Initial call to check and send notification
+  setTimeout(sendTestNotification, 2 * 60 * 1000);
+
+  // Repeat notification every hour
+  const intervalId = setInterval(sendTestNotification, 60 * 60 * 1000);
+
+  // Send message to the main process to toggle auto-sync off
+  ipcRenderer.send('toggle-auto-sync', false);
+},
 
 
   

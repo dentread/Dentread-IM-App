@@ -148,6 +148,7 @@ function createWindow() {
         mainWindow.hide();
 
           mainWindow.on('close', preventClose);
+
           const contextMenu = Menu.buildFromTemplate([
             { label: 'Open', click: () => mainWindow.show() },
             { type: 'separator' },
@@ -185,7 +186,7 @@ function createWindow() {
           }
        
         try {
-          const intervalId = setInterval(updateNotification, 1 * 60 * 60 * 1000);}
+          const intervalId = setInterval(updateNotification, 2 * 60 * 60 * 1000);}
           catch (error) {
             console.error('Error in auto-update process:', error);
           }
