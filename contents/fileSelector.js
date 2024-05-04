@@ -278,7 +278,7 @@ const viewTargetedFolderdentraed = async () => {
 let uploadedFileNumber = 0;
 let uploadFilePercent = 0;
 function handleTheUploadedContentCount() {
-    const allStagedFiles = document.getElementById('allStagedFiles');
+    const allStagedFiles = document.getElementById('allStagedFilesdentread');
     const liElements = allStagedFiles.querySelectorAll('li');
     const totalFileCount = liElements.length;
 
