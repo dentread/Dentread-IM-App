@@ -78,7 +78,7 @@
                 </div>
                 <div class="upload-progress-bar col-md-12 pt-3">
                     <div class="progress">
-                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" id="uploadProgressBar" role="progressbar" style="width: 0%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">0%</div>
                     </div>
                 </div>
                 <div class="upload-progress-status col-md-12 pt-1 text-end">
@@ -329,26 +329,13 @@ document.addEventListener("DOMContentLoaded", function() {
         const progress = document.querySelector('.progress-bar');
         const liElements = allStagedFiles.querySelectorAll('li');
         const totalFileCount = liElements.length;
-        const uploadedFileCount = totalFileCount - allStagedFiles.querySelectorAll('.staged-file-remove').length;
-
-        let progressPercentage = 0;
-        if (totalFileCount > 0) {
-            progressPercentage = (uploadedFileCount / totalFileCount) * 100;
-        } else {
-            progressPercentage = 100;
-        }
-
-        // Update progress bar width
-        progress.style.width = progressPercentage + "%";
-        progress.innerText = Math.round(progressPercentage) + "%";
-
         let uploadableFiles = totalFileCount;
         let uploadedFiles = 0;
         document.getElementById('totalStagedFile').innerText = uploadableFiles;
         document.getElementById('totalUploadedFile').innerText = uploadedFiles;
+        document.getElementById('uploadProgressBar').style.width = `0%`;
+        document.getElementById('uploadProgressBar').innerText = `0%`;
     }
-
-    // Call updateProgressBar initially
     updateProgressBar();
 
     // Call updateProgressBar whenever files are updated

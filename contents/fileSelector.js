@@ -276,19 +276,27 @@ const viewTargetedFolderdentraed = async () => {
 };
 
 let uploadedFileNumber = 0;
+let uploadFilePercent = 0;
 function handleTheUploadedContentCount() {
     const allStagedFiles = document.getElementById('allStagedFiles');
     const liElements = allStagedFiles.querySelectorAll('li');
     const totalFileCount = liElements.length;
-    
+
     if (totalFileCount !== uploadedFileNumber && totalFileCount > uploadedFileNumber) {
         uploadedFileNumber += 1;
         document.getElementById('totalUploadedFile').innerText = uploadedFileNumber;
+        
+        uploadFilePercent = (uploadedFileNumber / totalFileCount) * 100;
+        document.getElementById('uploadProgressBar').style.width = `${uploadFilePercent}%`;
+        document.getElementById('uploadProgressBar').innerText = `${uploadFilePercent.toFixed(2)}%`;
     }
-    if(totalFileCount === uploadedFileNumber){
+
+    if (totalFileCount === uploadedFileNumber) {
         uploadedFileNumber = 0;
+        uploadFilePercent = 0;
     }
 }
+
 
 
 const syncButtondentreadstage = document.getElementById('syncToDentreadId');
