@@ -410,7 +410,6 @@ function createCustomScheduler() {
     customSchedule = null;
     mainWindow.reload();
   });
-  customSchedule.webContents.openDevTools();
 }
 
 ipcMain.handle('open-scheduler', () => {
