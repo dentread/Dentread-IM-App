@@ -394,6 +394,10 @@ manualButton.addEventListener('click', async () => {
     // document.getElementById('headermessage').textContent = 'Autosync Disabled';
     // document.getElementById('headermessage').style.color = 'red';
     localStorage.setItem('prefSyncOption', 'manualSync');
+    await window.versions.manualbuttonfunc();
+
+    await window.versions.minimizeWindow2();
+
 });
 
 
