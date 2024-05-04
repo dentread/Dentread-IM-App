@@ -275,6 +275,22 @@ const viewTargetedFolderdentraed = async () => {
     stgToSyncSection.classList.remove('d-none');
 };
 
+let uploadedFileNumber = 0;
+function handleTheUploadedContentCount() {
+    const allStagedFiles = document.getElementById('allStagedFiles');
+    const liElements = allStagedFiles.querySelectorAll('li');
+    const totalFileCount = liElements.length;
+    
+    if (totalFileCount !== uploadedFileNumber && totalFileCount > uploadedFileNumber) {
+        uploadedFileNumber += 1;
+        document.getElementById('totalUploadedFile').innerText = uploadedFileNumber;
+    }
+    if(totalFileCount === uploadedFileNumber){
+        uploadedFileNumber = 0;
+    }
+}
+
+
 const syncButtondentreadstage = document.getElementById('syncToDentreadId');
 syncButtondentreadstage.addEventListener('click', () => {
 if (func2Running) {
@@ -322,6 +338,7 @@ const func3 = async (reqdId, loaderDiv) => {
                 loaderDiv.replaceWith(timeoutImage);
                 
             } else if (response) {
+                console.log('Response Uploaded: ', response);
                 const successImage = document.createElement('img');
                 successImage.src = '../images/tick-check.png';
                 successImage.alt = 'Success';
@@ -334,6 +351,7 @@ const func3 = async (reqdId, loaderDiv) => {
                     await fetchData();
                     await func6();
                 }
+                handleTheUploadedContentCount()
             } else {
                 const failureImage = document.createElement('img');
                 failureImage.src = '../images/cross-check.png';

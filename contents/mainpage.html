@@ -84,9 +84,9 @@
                 <div class="upload-progress-status col-md-12 pt-1 text-end">
                     <div class="progress-status">
                         <i class="fas fa-folder"></i>
-                        <span class="uploaded-file">2</span>
+                        <span id="totalUploadedFile">0</span>
                         <span class="count-devider"> / </span>
-                        <span class="total-file">30</span>
+                        <span id="totalStagedFile">0</span>
                     </div>
                 </div>
             </div>
@@ -264,13 +264,10 @@
 function runLogic() {
     var button = document.getElementById("stageToSync");
     button.click();
-    console.log("stageToSync click completed.");
 
     setTimeout(function() {
         var button = document.getElementById("syncToDentreadId");
         button.click();
-        console.log("syncToDentreadId click completed.");
-
         setTimeout(runLogic, 5 * 60 * 1000);
     }, 30 * 1000); 
 }
@@ -334,18 +331,22 @@ document.addEventListener("DOMContentLoaded", function() {
         const liElements = allStagedFiles.querySelectorAll('li');
         const totalFileCount = liElements.length;
         const uploadedFileCount = totalFileCount - allStagedFiles.querySelectorAll('.staged-file-remove').length;
-        let progressPercentage = 0;
 
-        // Calculate progress percentage
+        let progressPercentage = 0;
         if (totalFileCount > 0) {
             progressPercentage = (uploadedFileCount / totalFileCount) * 100;
         } else {
-            progressPercentage = 100; // If there are no files, progress is 100%
+            progressPercentage = 100;
         }
 
         // Update progress bar width
         progress.style.width = progressPercentage + "%";
         progress.innerText = Math.round(progressPercentage) + "%";
+
+        let uploadableFiles = totalFileCount;
+        let uploadedFiles = 0;
+        document.getElementById('totalStagedFile').innerText = uploadableFiles;
+        document.getElementById('totalUploadedFile').innerText = uploadedFiles;
     }
 
     // Call updateProgressBar initially
@@ -353,8 +354,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Call updateProgressBar whenever files are updated
     document.getElementById('stageToSync').addEventListener('click', updateProgressBar);
-
-    // Use MutationObserver to monitor changes in the DOM and update the progress bar accordingly
     const observer = new MutationObserver(updateProgressBar);
     const allStagedFiles = document.getElementById('allStagedFiles');
     observer.observe(allStagedFiles, { childList: true });
