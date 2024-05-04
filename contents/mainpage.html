@@ -283,22 +283,21 @@ function runLogic() {
         if (storedTime) {
             if (isMatchTime(storedTime)) {
                 runLogic();
-                setTimeout(stopCheckingMatchTime, 6 * 60 * 1000);
+                setTimeout(stopCheckingMatchTime, 60 * 60 * 1000);
             } else {
                 const timeDifference = calculateTimeDifference(storedTime);
                 setTimeout(startCheckingMatchTime, 60000);
             }
         }
-        setTimeout(stopCheckingMatchTime, 6 * 60 * 1000) }
 
-    function stopCheckingMatchTime() {
-            console.log("Stopping synchronization after 6 min.");
-        }
-
-        startCheckingMatchTime();
+    }
+    startCheckingMatchTime();
     }
 });
-
+async function stopCheckingMatchTime() {
+    console.log("Stopping synchronization after 60 min.");
+    await window.versions.manualbuttonfunc();
+}
     const manualSyncBtn = document.getElementById('manualSyncBtn');
     const scheduleSyncBtn = document.getElementById('scheduleSyncBtn');
     manualSyncBtn.addEventListener('click', ()=>{
