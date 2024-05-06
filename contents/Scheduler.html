@@ -67,9 +67,23 @@
                 <button class="btn dentread-button active-button-identify" type="button" id="storeSchedulePref">Save</button>
             </div>
         </div>
+        <div id="saveSuccessMessage" class="alert alert-success" style="display: none;">
+            Saved successfully!
+        </div>
     </div>
 
     <script>
+
+document.getElementById('storeSchedulePref').addEventListener('click', () => {
+
+            const saveSuccessMessage = document.getElementById('saveSuccessMessage');
+            saveSuccessMessage.style.display = 'block';
+
+            setTimeout(() => {
+                saveSuccessMessage.style.display = 'none';
+            }, 3000);
+        });
+
         const radioButtons = document.querySelectorAll('input[name="scheduleType"]');
         radioButtons.forEach(radioButton => {
             radioButton.addEventListener('click', function() {
