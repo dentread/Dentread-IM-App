@@ -177,26 +177,22 @@
                 disableButton(false);
             }
         };
-        function simulateButtonClick(buttonId, delay) {
+        function simulateButtonClick(buttonId) {
             let selectedButton = document.getElementById(buttonId);
             selectedButton.click();
-        };
-        const delay = 30000;
-        function simulateButtonClickIfButtonOn(buttonId, delay) {
-            if (isButtonOn()) {
-                let selectedButton = document.getElementById(buttonId);
+        }
+        function simulateButtonClickCycle() {
+            setTimeout(function() {
+                handleTheSyncState();
                 setTimeout(function() {
-                    selectedButton.click();
-                }, delay);
-            }
-        };
+                    simulateButtonClick("syncToDentreadId"); 
+                    setTimeout(simulateButtonClickCycle, 120000);
+                }, 30000); 
+            }, 60000); 
+        }
         
         document.addEventListener("DOMContentLoaded", function() {
-            handleTheSyncState();
-            setTimeout(function() {
-                const buttonId = isButtonOn() ? "stageToSync" : "syncToDentreadId";
-                simulateButtonClickIfButtonOn(buttonId, isButtonOn() ? 30000 : 120000);
-            }, delay);
+            simulateButtonClickCycle();
         });
 
 
