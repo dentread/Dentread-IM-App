@@ -428,3 +428,19 @@ ipcMain.handle('open-reload-manual', () => {
   return true;
 
 });
+
+// app.on('window-all-closed', () => {
+//   const projectPath = './';
+//   const directoryPath = path.join(projectPath, 'Dentread');
+
+//   if (fs.existsSync(directoryPath)) {
+//     rimraf.sync(directoryPath);
+//     console.log(`Directory deleted: ${directoryPath}`);
+//   } else {
+//     console.log('Directory does not exist');
+//   }
+
+//   if (process.platform !== 'darwin') {
+//     app.quit();
+//   }
+// });

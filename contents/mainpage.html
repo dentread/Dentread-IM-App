@@ -166,15 +166,13 @@
 
         function handleTheSyncState(){
             if (isButtonOn()) {
-                const stageSyncButton = document.getElementById("stageToSync");
-                stageSyncButton.click();
-                setTimeout(function() {
-                    simulateButtonClick("syncToDentreadId", 30000);
-                }, 30000);
                 disableButton(true);
+                return true;
+            
             }
             else{
                 disableButton(false);
+                return false;
             }
         };
         function simulateButtonClick(buttonId) {
@@ -182,18 +180,24 @@
             selectedButton.click();
         }
         function simulateButtonClickCycle() {
+
+            if (handleTheSyncState()) {
+            var stageButton = document.getElementById("stageToSync");
+            stageButton.click();
+
             setTimeout(function() {
-                handleTheSyncState();
-                setTimeout(function() {
-                    simulateButtonClick("syncToDentreadId"); 
-                    setTimeout(simulateButtonClickCycle, 120000);
-                }, 30000); 
-            }, 60000); 
+                var syncButton = document.getElementById("syncToDentreadId");
+                syncButton.click();
+
+                setTimeout(simulateButtonClickCycle, 4 * 60 * 1000);
+            }, 40 * 1000);
         }
+    }
         
-        document.addEventListener("DOMContentLoaded", function() {
-            simulateButtonClickCycle();
-        });
+            document.addEventListener("DOMContentLoaded", function() {
+                
+                    simulateButtonClickCycle();
+            });
 
 
     document.addEventListener("DOMContentLoaded", function() {

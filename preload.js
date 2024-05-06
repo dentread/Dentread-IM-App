@@ -134,7 +134,9 @@ contextBridge.exposeInMainWorld('versions', {
       const username = localStorage.getItem('savedUsername');
       const dentreadDirectoryPath = path.join(projectPath, 'Dentread');
       const usernameDirectoryPath = path.join(dentreadDirectoryPath, username);
-      const targetPath = path.join(usernameDirectoryPath, directoryName);
+      const sanitizedDirectoryName = directoryName.trim(); // Remove leading and trailing spaces
+      const targetPath = path.join(usernameDirectoryPath, sanitizedDirectoryName);
+      console.log(targetPath,"targetPath")
   
       if (fs.existsSync(targetPath)) {
         if (fs.lstatSync(targetPath).isDirectory()) {
@@ -147,6 +149,8 @@ contextBridge.exposeInMainWorld('versions', {
               rimraf.sync(itemPath);
             } else {
               fs.unlinkSync(itemPath);
+              console.log(`Error deleting ${itemPath}: ${unlinkError.message}`);
+
             }
           }
           
