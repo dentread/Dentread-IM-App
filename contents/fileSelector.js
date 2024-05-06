@@ -281,6 +281,11 @@ function handleTheUploadedContentCount() {
     const allStagedFiles = document.getElementById('allStagedFilesdentread');
     const liElements = allStagedFiles.querySelectorAll('li');
     const totalFileCount = liElements.length;
+    
+    
+    
+    // const totalFileCount = localStorage.getItem('progresscount');
+    // console.log(totalFileCount,"totalFileCount", uploadedFileNumber,"uploadedFileNumber" )
 
     if (totalFileCount !== uploadedFileNumber && totalFileCount > uploadedFileNumber) {
         uploadedFileNumber += 1;

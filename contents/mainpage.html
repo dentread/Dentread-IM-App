@@ -329,6 +329,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const progress = document.querySelector('.progress-bar');
         const liElements = allStagedFiles.querySelectorAll('li');
         const totalFileCount = liElements.length;
+        // localStorage.setItem('progresscount',totalFileCount)
         let uploadableFiles = totalFileCount;
         let uploadedFiles = 0;
         document.getElementById('totalStagedFile').innerText = uploadableFiles;
@@ -343,6 +344,13 @@ document.addEventListener("DOMContentLoaded", function() {
     const observer = new MutationObserver(updateProgressBar);
     const allStagedFiles = document.getElementById('allStagedFiles');
     observer.observe(allStagedFiles, { childList: true });
+    // setInterval(updateProgressBar, 10000);
+    
+    // const observer = new MutationObserver(updateProgressBar);
+    // const allStagedFiles = localStorage.getItem(progresscount)
+    // observer.observe(allStagedFiles, { childList: true });
+
+
 });
 
 
