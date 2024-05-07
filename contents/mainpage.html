@@ -132,12 +132,12 @@
             const storedPrefSyncOption = localStorage.getItem('prefSyncOption');
             const prefRadioValue = localStorage.getItem('prefRadioValue');
             const userShowSync = document.getElementById('userShowSync');
-            let actualValue = 'Manual Sync';
+            let actualValue = 'Manual';
             if(storedPrefSyncOption && storedPrefSyncOption === 'scheduleSync'){
                 if (prefRadioValue && prefRadioValue === 'perpetualSchedule'){
-                    actualValue = 'Schedule Sync (Perpetual)';
+                    actualValue = 'Schedule (Perpetual)';
                 }else if(prefRadioValue && prefRadioValue === 'customSchedule'){
-                    actualValue = 'Schedule Sync (Custom)';
+                    actualValue = 'Schedule (Custom)';
                 }
             }
             userShowSync.innerText = actualValue;
