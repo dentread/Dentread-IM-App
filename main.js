@@ -95,8 +95,8 @@ let customDialog;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1000,
+    height: 800,
     icon: path.join(__dirname, 'images/LogoDentread.png'),
     title: 'Dentread',
     webPreferences: {
@@ -256,8 +256,8 @@ app.whenReady().then(() => {
 
 function createCustomDialog() {
   customDialog = new BrowserWindow({
-    width: 450,
-    height: 420,
+    width: 600,
+    height: 450,
     parent: mainWindow,
     modal: true,
     show: false,
