@@ -216,10 +216,10 @@ const listDirectoryContents = async (directoryPath) => {
     return response;
 };
 
-let func2Running = false;
+let func2Running;
 const syncButton = document.getElementById('stageToSync');
 syncButton.addEventListener('click', () => {
-    func2Running = false;
+    
     viewTargetedFolder()
     .then(() => {fetchData()
     })
@@ -227,10 +227,11 @@ syncButton.addEventListener('click', () => {
         func6();
     })
     .then(() => {
+        func2Running = true;
         func2();
     })
     .then(() => {
-        func2Running = true;
+        func2Running = false;
     });
 });
 
@@ -250,6 +251,7 @@ const viewTargetedFolderdentraed = async () => {
 
     const ul = document.createElement('ul');
     ul.className = 'custom-list2';
+    const func3Promises = [];
 
     response.forEach((item, index) => {
         const li = document.createElement('li');
@@ -268,11 +270,25 @@ const viewTargetedFolderdentraed = async () => {
         li.appendChild(loaderDiv);
 
         ul.appendChild(li);
-        func3(item.name, loaderDiv);
-    });
+        func3Promises.push(func3(item.name, loaderDiv));
 
+    });
     allStagedFilesContainer.appendChild(ul);
     stgToSyncSection.classList.remove('d-none');
+    await Promise.all(func3Promises);
+    const PrefSyncOption = localStorage.getItem('prefSyncOption');
+    if (PrefSyncOption === 'scheduleSync') {
+        document.getElementById('stageToSync').click();
+        console.log("Initial button click completed");
+
+        // Delay the click on the other button by 30 seconds
+        setTimeout(() => {
+            document.getElementById('syncToDentreadId').click();
+            console.log("Second button clicked after 30 seconds");
+        }, 30000);
+    }
+
+
 };
 
 let uploadedFileNumber = 0;
@@ -306,7 +322,7 @@ function handleTheUploadedContentCount() {
 
 const syncButtondentreadstage = document.getElementById('syncToDentreadId');
 syncButtondentreadstage.addEventListener('click', () => {
-if (func2Running) {
+if (!func2Running) {
     viewTargetedFolderdentraed();
 } else {
     console.log('func2 is still running. wait for sync');
@@ -360,10 +376,12 @@ const func3 = async (reqdId, loaderDiv) => {
                 successImage.style.marginLeft = '20px';
                 loaderDiv.replaceWith(successImage);
                 if (reqdId !== null) {
+                    console.log(reqdId,"reqdId1")
                     await func7(reqdId);
                     await fetchData();
                     await func6();
                 }
+
                 handleTheUploadedContentCount()
             } else {
                 const failureImage = document.createElement('img');
@@ -374,6 +392,8 @@ const func3 = async (reqdId, loaderDiv) => {
                 failureImage.style.marginLeft = '20px';
                 loaderDiv.replaceWith(failureImage);
             }
+
+
         }
     } catch (error) {
         if (loaderDiv) {
