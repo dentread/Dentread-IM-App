@@ -232,6 +232,13 @@ syncButton.addEventListener('click', () => {
     })
     .then(() => {
         func2Running = false;
+        const PrefSyncOption = localStorage.getItem('prefSyncOption');
+        if (PrefSyncOption === 'scheduleSync') {
+
+            setTimeout(() => {
+                document.getElementById('syncToDentreadId').click();
+            }, 30000);
+        }
     });
 });
 
