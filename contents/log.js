@@ -61,7 +61,7 @@ function fetchlogData() {
         window.location.href = 'login_dentread.html';
     } else {
 
-        const apiUrl = 'http://testapi.dentread.com/user-directory/';
+        const apiUrl = 'https://api.dentread.com/user-directory/';
 
         fetch(apiUrl, {
             method: 'GET',

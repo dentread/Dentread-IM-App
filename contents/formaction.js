@@ -45,7 +45,7 @@ loginForm.addEventListener('submit', async (event) => {
     const rememberMe = rememberMeCheckbox.checked; 
 
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', 'http://testapi.dentread.com/authenticate_desktop/');
+    xhr.open('POST', 'https://api.dentread.com/authenticate_desktop/');
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     xhr.responseType = 'json';
 

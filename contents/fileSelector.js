@@ -30,7 +30,7 @@ function fetchExtensions() {
         console.error('Token not available. Redirecting to login page...');
     } else {
 
-        const apiUrl = 'http://testapi.dentread.com/fileextentions/';
+        const apiUrl = 'https://api.dentread.com/fileextentions/';
 
         return fetch(apiUrl, {
             method: 'GET',
@@ -502,7 +502,7 @@ function fetchData() {
         window.location.href = 'login_dentread.html';
     } else {
 
-        const apiUrl = 'http://testapi.dentread.com/user-folders/';
+        const apiUrl = 'https://api.dentread.com/user-folders/';
 
         fetch(apiUrl, {
             method: 'GET',
@@ -571,7 +571,7 @@ function Scheduleevent() {
         window.location.href = 'login_dentread.html';
     } else {
 
-        const apiUrl = 'http://testapi.dentread.com/getschedule/';
+        const apiUrl = 'https://api.dentread.com/getschedule/';
 
         fetch(apiUrl, {
                 method: 'GET',

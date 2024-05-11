@@ -245,7 +245,7 @@ document.getElementById('storeSchedulePref').addEventListener('click', () => {
         const tokenValue = authToken['access'];
 
         // Send POST request to the API endpoint
-        fetch('http://testapi.dentread.com/schedule/', {
+        fetch('https://api.dentread.com/schedule/', {
             method: 'POST',
             headers: {
                 // Authorization header with token value
