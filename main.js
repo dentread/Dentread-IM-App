@@ -34,6 +34,7 @@ app.on('ready', () => {
 
     autoUpdater.on('update-downloaded', () => {
       console.log('Update downloaded. Ready to install.');
+      app.removeAllListeners('before-quit');
       autoUpdater.quitAndInstall();
     });
   });
