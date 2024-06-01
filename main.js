@@ -30,12 +30,12 @@ app.on('ready', () => {
   autoUpdater.checkForUpdates();
 
   autoUpdater.on('update-available', () => {
+    isUpdateInProgress = true;
     autoUpdater.downloadUpdate();
 
     autoUpdater.on('update-downloaded', () => {
       console.log('Update downloaded. Ready to install.');
       app.removeAllListeners('before-quit');
-      isUpdateInProgress = true;
       autoUpdater.quitAndInstall();
     });
   });
