@@ -9,7 +9,7 @@ const { exec } = require('child_process');
 let tray;
 
 
-
+let isUpdateInProgress = false;
 
 
 
@@ -35,6 +35,7 @@ app.on('ready', () => {
     autoUpdater.on('update-downloaded', () => {
       console.log('Update downloaded. Ready to install.');
       app.removeAllListeners('before-quit');
+      isUpdateInProgress = true;
       autoUpdater.quitAndInstall();
     });
   });
@@ -204,6 +205,9 @@ function createWindow() {
 
 
   mainWindow.on('close', async(event) => {
+    if (isUpdateInProgress) {
+      return;
+    }
     const choice = require('electron').dialog.showMessageBoxSync(mainWindow, {
       type: 'question',
       buttons: ['Yes', 'No'],
