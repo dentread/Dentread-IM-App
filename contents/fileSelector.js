@@ -101,9 +101,16 @@ const func2 = async () => {
 
 const pushUniqueContents = async (allContents, folderNamesSet, filenamesSet, path) => {
     const contents = await listDirectoryContents(path);
+    const timeslot = localStorage.getItem('timeslot');
+    const defaultTimeslot = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+
+    const timeslotValue = timeslot ? parseInt(timeslot, 10) : defaultTimeslot;
+    const twentyFourHoursAgo = new Date().getTime() - timeslotValue;
+
     contents.forEach(item => {
         // Check if the item is not already present in localStorage
-        if (!folderNamesSet.has(item.name) && !filenamesSet.has(item.name)) {
+        console.log(item ,"item.createdTimestamp ")
+        if (!folderNamesSet.has(item.name) && !filenamesSet.has(item.name)&& item.createdTimestamp >= twentyFourHoursAgo) {
             allContents.push(item);
             // Add the item to the appropriate set based on its type (folder or file)
             if (item.isDirectory) {
@@ -433,6 +440,7 @@ scheduleButton.addEventListener('click', async () => {
 
 
 document.addEventListener('DOMContentLoaded', async() => {
+    await timeslot();
     const storedPrefSyncOption = localStorage.getItem('prefSyncOption');
     if(storedPrefSyncOption && storedPrefSyncOption === 'scheduleSync'){
         // document.getElementById('headermessage').textContent = 'Autosync is running...';
@@ -467,9 +475,9 @@ logoutButton.addEventListener('click', () => {
     window.location.href = 'login_dentread.html';
 });
 
-// const func5 = async () => {
-//     const response = await window.versions.deleteDirectory();
-// };
+const func5 = async () => {
+    const response = await window.versions.deleteDirectory();
+};
 
 const func7 = async (newDirectoryPath) => {
     const response = await window.versions.emptyDirectory(newDirectoryPath);
@@ -582,6 +590,7 @@ function Scheduleevent() {
             })
             .then(response => {
                 if (response.ok) {
+
                     return response.json();
                 } else {
                     console.error('API request error:', response.statusText);
@@ -592,10 +601,9 @@ function Scheduleevent() {
                 if (data.length === 0) {
                     console.warn('No schedule data available.');
                 } else {
-                    const scheduleData = {}; // Object to store schedule data
+                    const scheduleData = {};
 
                     data.forEach(item => {
-                        // Assign hostname as the value for each time key
                         scheduleData[item.hostname] = item.time;
                     });
 
@@ -604,8 +612,47 @@ function Scheduleevent() {
             })
             .catch(error => {
                 console.error('API request error:', error.message);
-                // Handle the error, such as displaying an error message to the user
             });
 
     }
 };
+
+function timeslot() {
+    const token = JSON.parse(localStorage.getItem('token'));
+    let access_token = token.access;
+
+    if (!token) {
+        console.error('Token not available. Redirecting to login page...');
+        window.location.href = 'login_dentread.html';
+    } else {
+
+        const apiUrl = 'https://api.dentread.com/timeslot/';
+
+        fetch(apiUrl, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${access_token}`,
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    console.error('API request error:', response.statusText);
+                    throw new Error('Failed to fetch time data');
+                }
+            })
+            .then(data => {
+                if (!data || !data.timeslots || data.timeslots.length === 0) {
+                    console.warn('No time data available.');
+                } else {
+                    localStorage.setItem('timeslot', data.timeslots[0]);
+                }
+            })
+            .catch(error => {
+                console.error('API request error:', error.message);
+            });
+
+    }
+}

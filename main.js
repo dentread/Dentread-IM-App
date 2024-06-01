@@ -202,7 +202,7 @@ function createWindow() {
   });
 
 
-  mainWindow.on('close', (event) => {
+  mainWindow.on('close', async(event) => {
     const choice = require('electron').dialog.showMessageBoxSync(mainWindow, {
       type: 'question',
       buttons: ['Yes', 'No'],
@@ -213,9 +213,13 @@ function createWindow() {
     })
 
 
-    if (choice === 1) {
-      event.preventDefault()
+    if (choice === 0) {
+      const response = await mainWindow.webContents.executeJavaScript(`window.versions.deleteDirectory()`);
     }
+    else {
+      event.preventDefault();
+    }
+    
   })
 
   

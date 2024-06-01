@@ -84,6 +84,7 @@ contextBridge.exposeInMainWorld('versions', {
   chrome: () => process.versions.chrome,
   electron: () => process.versions.electron,
   ping: () => ipcRenderer.invoke('ping'),
+  deleteDirectory: () => ipcRenderer.invoke('deleteDirectory'),
 
 
   
@@ -115,13 +116,22 @@ contextBridge.exposeInMainWorld('versions', {
     try {
       const projectPath = './';
       const directoryPath = path.join(projectPath, 'Dentread');
+      const localStorageValue = localStorage.getItem('prefSyncOption');
+
   
       if (fs.existsSync(directoryPath)) {
+        if (localStorageValue==='manualSync'){
         rimraf.sync(directoryPath);
+        }
+        else
+        {
+            console.log("no manual sync found")
+        }
         return { success: true, message: `Directory deleted: ${directoryPath}` };
       } else {
         return { success: false, message: 'Directory does not exist' };
       }
+    // }
     } catch (error) {
       return { success: false, message: error.message };
     }
@@ -183,6 +193,14 @@ contextBridge.exposeInMainWorld('versions', {
         }
         let currentTime = new Date().toLocaleString();
 
+        let currentonlytime = new Date().getTime();
+        const timeslot = localStorage.getItem('timeslot');
+        const defaultTimeslot = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+    
+        const timeslotValue = timeslot ? parseInt(timeslot, 10) : defaultTimeslot;
+        const twentyFourHoursAgo = currentonlytime - timeslotValue;
+
+
         const items = fs.readdirSync(sourceDirectory);
         let totalCopied = 0;
     
@@ -193,11 +211,15 @@ contextBridge.exposeInMainWorld('versions', {
           const item = items.shift();
           const sourceItemPath = path.join(sourceDirectory, item);
           const destinationItemPath = path.join(destinationDirectory, item);
+
+          const creationTime = fs.statSync(sourceItemPath).birthtime.getTime();
+          console.log(creationTime,"creationTime")
+          console.log(twentyFourHoursAgo,"twentyFourHoursAgo")
     
           if (fs.statSync(sourceItemPath).isDirectory()) {
             const folderNamesSet = new Set(JSON.parse(localStorage.getItem('folderNames')));
             if (!folderNamesSet.has(item)) {
-              if (!item.endsWith('.zip')) {
+              if (!item.endsWith('.zip')&& creationTime >= twentyFourHoursAgo) {
                 const zipFileName = item + '.zip';
                 const output = fs.createWriteStream(path.join(destinationDirectory, zipFileName));
                 const archive = archiver('zip', {
@@ -224,7 +246,7 @@ contextBridge.exposeInMainWorld('versions', {
             const fileExtension = path.extname(item).toLowerCase();
             if (fileExtensions.includes(fileExtension)) {
               const filenameSet = new Set(JSON.parse(localStorage.getItem('filenames')));
-              if (!filenameSet.has(item)) {
+              if (!filenameSet.has(item)&& creationTime >= twentyFourHoursAgo) {
                 fs.copyFileSync(sourceItemPath, destinationItemPath);
                 totalCopied++;
                 console.log(`At [${currentTime}] Copied folder: ${sourceItemPath} to ${destinationItemPath}`);
@@ -255,7 +277,8 @@ contextBridge.exposeInMainWorld('versions', {
 
       return items.map((item, index) => ({
           name: item,
-          isDirectory: stats[index].isDirectory()
+          isDirectory: stats[index].isDirectory(),
+          createdTimestamp: stats[index].birthtimeMs
       }));
   } catch (error) {
       console.error('Error listing files and folders:', error);
