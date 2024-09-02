@@ -51,7 +51,7 @@
     "electron-notification": "^1.0.0",
     "electron-squirrel-startup": "^1.0.0",
     "electron-store": "^8.2.0",
-    "electron-updater": "^6.1.4",
+    "electron-updater": "^6.3.3",
     "form-data": "^4.0.0",
     "got": "^13.0.0",
     "jquery": "^3.7.1",
