@@ -228,7 +228,7 @@ function createWindow() {
   })
 
   
-  // mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
 
 }
 
@@ -291,7 +291,9 @@ function createCustomDialog() {
 
   customDialog.on('closed', () => {
     customDialog = null;
+    mainWindow.reload();
   });
+  customDialog.webContents.openDevTools();
 }
 
 ipcMain.handle('open-settings', () => {
@@ -331,6 +333,7 @@ function createcustomlog() {
   customlog.on('closed', () => {
     customlog = null;
   });
+  
 }
 
 ipcMain.handle('open-logs', () => {

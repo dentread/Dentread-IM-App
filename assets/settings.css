@@ -126,3 +126,11 @@ footer{
     border-top-right-radius: 24px !important;
     border-bottom-right-radius: 24px !important;
 }
+
+.alert-area{
+    padding: 10px;
+    border-radius: 5px;
+}
+.warn-color{
+    color: red;
+}

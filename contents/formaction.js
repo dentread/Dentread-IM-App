@@ -44,6 +44,10 @@ loginForm.addEventListener('submit', async (event) => {
     const password = passwordInput.value;
     const rememberMe = rememberMeCheckbox.checked; 
 
+    const linkedDevice = localStorage.getItem('linkedDevice');
+    const appLiscence = localStorage.getItem('appLiscence');
+    const linkedDeviceName = localStorage.getItem('linkedDeviceName');
+
     const xhr = new XMLHttpRequest();
     xhr.open('POST', 'https://api.dentread.com/authenticate_desktop/');
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -52,6 +56,7 @@ loginForm.addEventListener('submit', async (event) => {
     xhr.onload = function () {
         if (xhr.status === 200) {
             if (xhr.response && xhr.response.token) {
+                const isLinked = xhr.response.isLinked
                 const token = xhr.response.token;
                 const user_name = xhr.response.name;
                 const orgname = xhr.response.orgname;
@@ -84,7 +89,10 @@ loginForm.addEventListener('submit', async (event) => {
                     localStorage.removeItem('savedPassword');
                 }
 
-
+                if (!isLinked && linkedDevice && appLiscence && linkedDeviceName) {
+                    localStorage.removeItem('linkedDevice');
+                    localStorage.removeItem('linkedDeviceName');
+                }
                 window.location.href = 'mainpage.html';
             } else {
                 doSomething('Authentication failed');
@@ -98,7 +106,7 @@ loginForm.addEventListener('submit', async (event) => {
         console.error('API request error:', xhr.statusText);
     };
 
-    const formData = `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`;
+    const formData = `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}&linkedDevice=${encodeURIComponent(linkedDevice)}&appLiscence=${encodeURIComponent(appLiscence)}`;
 
     xhr.send(formData);
 });

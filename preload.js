@@ -13,7 +13,8 @@ const sendFileToAPI = async (filePath, apiUrl, accessToken, username) => {
   const folderName_withzip = path.basename(filePath);
   const folderName = path.parse(filePath).name;
   const fileStream = fs.createReadStream(filePath);
-
+  const linkedDevice = localStorage.getItem('linkedDevice');
+  const appLiscence = localStorage.getItem('appLiscence');
 
   const formData = new FormData();
   formData.append('directory_path', folderName);
@@ -21,8 +22,8 @@ const sendFileToAPI = async (filePath, apiUrl, accessToken, username) => {
   formData.append('files', fileStream, {
     filename: folderName_withzip,
   });
-
-
+  formData.append('deviceUID', linkedDevice);
+  formData.append('appLiscence', appLiscence);
 
   const response = await fetch(apiUrl, {
     method: 'POST',
@@ -291,7 +292,6 @@ contextBridge.exposeInMainWorld('versions', {
     try {
 
       let currentTime = new Date().toLocaleString();
-      console.log(`At [${currentTime}] : Sync start for: ${reqdId}`);
 
       const savedUsername = localStorage.getItem('savedUsername');
       const currentWorkingDirectory = process.cwd();
@@ -363,8 +363,6 @@ contextBridge.exposeInMainWorld('versions', {
 
 
 manualbuttonfunc: async () => {
-
-
   ipcRenderer.invoke('open-reload-manual');
 },
 minimizeWindow2: async () => {

@@ -223,30 +223,78 @@ const listDirectoryContents = async (directoryPath) => {
     return response;
 };
 
+async function getLinkStatus() {
+    const linkedDevice = localStorage.getItem('linkedDevice');
+    const linkedDeviceName = localStorage.getItem('linkedDeviceName');
+    const appLiscence = localStorage.getItem('appLiscence');
+
+    const token = JSON.parse(localStorage.getItem('token'));
+    const acces_token = token.access;
+    if (!token) {
+        console.error('Token not available. Redirecting to login page...');
+        window.location.href = 'login_dentread.html';
+    } else {
+        const apiUrl = 'https://api.dentread.com/check-device-linkStatus/';
+        try {
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${acces_token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    deviceUID: linkedDevice,
+                    appLiscence: appLiscence
+                }),
+            });
+            if (response.ok) {
+                const data = await response.json();
+                if (data && !data.isLinked && appLiscence && linkedDevice && linkedDeviceName) {
+                    localStorage.removeItem('linkedDevice');
+                    localStorage.removeItem('linkedDeviceName');
+                    linkedDeviceInfo.innerHTML = `No Device Associated`;
+                    alertBox.innerHTML = `<i class="fas fa-exclamation-triangle warn-color mr-2"></i> No device is currently linked to the Dentread IM App. Please connect a device to enable data synchronization.`;
+                    alertContainer.style.backgroundColor = 'bisque';
+                    return false;
+                } else {
+                    return true;
+                }
+            } else {
+                console.error('API request error:', response.statusText);
+                return false;
+            }
+        } catch (error) {
+            console.error('API request error:', error.message);
+            return false;
+        }
+    }
+};
+
 let func2Running;
 const syncButton = document.getElementById('stageToSync');
-syncButton.addEventListener('click', () => {
-    
-    viewTargetedFolder()
-    .then(() => {fetchData()
-    })
-    .then(() => {
-        func6();
-    })
-    .then(() => {
-        func2Running = true;
-        func2();
-    })
-    .then(() => {
-        func2Running = false;
-        const PrefSyncOption = localStorage.getItem('prefSyncOption');
-        if (PrefSyncOption === 'scheduleSync') {
-
-            setTimeout(() => {
-                document.getElementById('syncToDentreadId').click();
-            }, 30000);
-        }
-    });
+syncButton.addEventListener('click', async () => {
+    const linkStatus = await getLinkStatus();
+    if(linkStatus){
+        viewTargetedFolder()
+        .then(() => {fetchData()
+        })
+        .then(() => {
+            func6();
+        })
+        .then(() => {
+            func2Running = true;
+            func2();
+        })
+        .then(() => {
+            func2Running = false;
+            const PrefSyncOption = localStorage.getItem('prefSyncOption');
+            if (PrefSyncOption === 'scheduleSync') {
+                setTimeout(() => {
+                    document.getElementById('syncToDentreadId').click();
+                }, 30000);
+            }
+        });
+    }
 });
 
 const viewTargetedFolderdentraed = async () => {

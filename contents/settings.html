@@ -11,6 +11,18 @@
   </head>
   <body>
     <div class="container-fluid mt-2">
+      <div class="col-sm-12 mb-2 alert-area" id="alertContainer">
+        <span id="alert-box"></span>
+      </div>
+      <div class="col-sm-12 d-flex align-items-end">
+        <div class="form-group col-10">
+          <label for="deviceOption">Link Device</label>
+          <select class="form-control input-border dentread-button" name="deviceOption" id="deviceOption">
+            <option value="">Select Device</option>
+          </select>
+        </div>
+        <button class="btn dentread-button col-2" id="linkDeviceAction">Link</button>
+      </div>
       <div class="col-sm-12">
         <div class="form-group col-sm-12 col-md-12 mt-3">
             <label for="choose-folder">Select Path</label>
@@ -38,7 +50,7 @@
             </div>
           </div>
         </div>
-        <div class="form-group col-sm-12 col-md-12 mt-2">
+        <div class="form-group col-sm-12 col-md-12 mt-2 d-none">
             <div class="input-group mb-3">
               <input type="text" class="form-control dentread-button br-style" id="syncedPathTwo">
               <div class="input-group-append buttonGrp">
@@ -46,7 +58,7 @@
               </div>
             </div>
           </div>
-          <div class="form-group col-sm-12 col-md-12 mt-2">
+          <div class="form-group col-sm-12 col-md-12 mt-2 d-none">
             <div class="input-group mb-3">
               <input type="text" class="form-control dentread-button br-style" id="syncedPathThree">
               <div class="input-group-append buttonGrp">
