@@ -13,9 +13,12 @@
     "releaseType": "release"
   },
   "nsis": {
-    "oneClick": false,
+    "oneClick": true,
     "perMachine": true,
-    "allowToChangeInstallationDirectory": true
+    "allowToChangeInstallationDirectory": true,
+    "allowElevation": true,
+    "forceCloseApplications": true,
+    "deleteAppDataOnUninstall": true
   },
   "build": {
     "appId": "com.dentread.Imapp",
@@ -45,6 +48,7 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.4.2",
     "archiver": "^6.0.1",
+    "auto-launch": "^5.0.6",
     "axios": "^1.5.0",
     "bootstrap": "^5.3.2",
     "dialog": "^0.3.1",

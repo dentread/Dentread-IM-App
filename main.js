@@ -5,6 +5,34 @@ const url = require('url');
 const notifier = require('node-notifier');
 const cron = require('node-cron');
 const { exec } = require('child_process');
+const AutoLaunch = require('auto-launch');
+
+const myAppAutoLauncher = new AutoLaunch({
+  name: 'DentIMApp',
+  path: process.execPath,
+  isHidden: true, 
+});
+
+app.on('ready', () => {
+
+  stopNotificationProcess();
+  const isAutoLaunch = app.getLoginItemSettings().wasOpenedAtLogin;
+  if (isAutoLaunch) {
+    mainWindow.once('ready-to-show', () => {
+      mainWindow.minimize();
+    });
+  }
+  myAppAutoLauncher.isEnabled().then((isEnabled) => {
+    if (!isEnabled) {
+      myAppAutoLauncher.enable().catch((err) => {
+        console.error('Failed to enable auto-launch:', err);
+      });
+    }
+  }).catch((err) => {
+    console.error('Auto-launch setup failed:', err);
+  });
+});
+
 
 let tray;
 
@@ -219,16 +247,27 @@ function createWindow() {
 
 
     if (choice === 0) {
-      const response = await mainWindow.webContents.executeJavaScript(`window.versions.deleteDirectory()`);
-    }
-    else {
+      try {
+        console.log('Disabling auto-launch...');
+        myAppAutoLauncher.disable().catch((err) => {
+          console.error('Failed to disable auto-launch:', err);
+        });
+  
+        console.log('Deleting directory...');
+        await mainWindow.webContents.executeJavaScript(`window.versions.deleteDirectory()`);
+  
+        console.log('Exiting application...');
+        app.quit();
+      } catch (error) {
+        console.error('Error during close operation:', error);
+      }
+    } else {
       event.preventDefault();
     }
-    
   })
 
   
-  mainWindow.webContents.openDevTools();
+  // mainWindow.webContents.openDevTools();
 
 }
 
@@ -293,7 +332,7 @@ function createCustomDialog() {
     customDialog = null;
     mainWindow.reload();
   });
-  customDialog.webContents.openDevTools();
+  // customDialog.webContents.openDevTools();
 }
 
 ipcMain.handle('open-settings', () => {
@@ -361,12 +400,14 @@ ipcMain.on('logError', (event, error) => {
   }
 });
 
+app.on('before-quit', async () => {
+  
+function startNotificationProcess() {
+  const { spawn } = require('child_process');
+  const nodePath = process.execPath;
+  const pidFilePath = path.join(__dirname, 'notification.pid');
 
-
-app.on('before-quit', () => {
-  function startNotificationProcess() {
-    const { spawn } = require('child_process');
-    const nodePath = process.execPath;
+  try {
     const notificationProcess = spawn(nodePath, ['notification.js'], {
       detached: true,
       stdio: ['ignore', 'ignore', 'ignore'],
@@ -375,21 +416,32 @@ app.on('before-quit', () => {
     notificationProcess.unref();
 
     notificationProcess.on('error', (error) => {
-      console.error(`Error starting notification process: ${error}`);
+      console.error(`Error starting notification process: ${error.message}`);
     });
 
     notificationProcess.on('exit', (code) => {
       console.log(`Notification process exited with code ${code}`);
-      fs.unlinkSync(pidFilePath);
+      if (fs.existsSync(pidFilePath)) {
+        fs.unlinkSync(pidFilePath);
+      }
     });
 
     notificationProcess.on('spawn', () => {
-      fs.writeFileSync(pidFilePath, notificationProcess.pid.toString());
+      try {
+        fs.writeFileSync(pidFilePath, notificationProcess.pid.toString(), { mode: 0o644 });
+        console.log(`Notification process started with PID: ${notificationProcess.pid}`);
+      } catch (fsError) {
+        console.error(`Error writing PID file: ${fsError.message}`);
+      }
     });
+  } catch (spawnError) {
+    console.error(`Failed to spawn notification process: ${spawnError.message}`);
   }
+}
 
   startNotificationProcess();
 });
+
 
 let customSchedule;
 function createCustomScheduler() {
