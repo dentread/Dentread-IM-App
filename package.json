@@ -61,7 +61,7 @@
     "node-cron": "^3.0.3",
     "node-fetch": "^2.6.6",
     "node-notifier": "^10.0.1",
-    "rimraf": "^5.0.5"
+    "rimraf": "^5.0.10"
   },
   "type": "commonjs",
   "publishers": [
