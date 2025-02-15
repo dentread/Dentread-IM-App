@@ -5,30 +5,14 @@ const url = require('url');
 const notifier = require('node-notifier');
 const cron = require('node-cron');
 const { exec } = require('child_process');
-const AutoLaunch = require('auto-launch');
 
-const myAppAutoLauncher = new AutoLaunch({
-  name: 'DentIMApp',
-  path: process.execPath,
-  isHidden: true,
-  mac: {
-    useLaunchAgent: true
-  }
-});
-
-myAppAutoLauncher.isEnabled().then((isEnabled) => {
-  if (!isEnabled) {
-    console.log('AutoLaunch is disabled. Not enabling automatically.');
-  }
-}).catch((err) => {
-  console.error('Error checking auto-launch status:', err);
-});
 
 
 
 app.on('ready', () => {
+  tray = new Tray(path.join(__dirname, 'images/LogoDentread.png'));
 
-  stopNotificationProcess();
+
 
 
 
@@ -41,17 +25,23 @@ let tray;
 
 // let isUpdateInProgress = false;
 
-
-
-const { autoUpdater,AppUpdater } = require("electron-updater");
-
-
-autoUpdater.autoDownload = false;
-
+// console.log(app.getLoginItemSettings());
 
 const pidFilePath = './notificationProcess.pid';
 
 let notificationProcess = null;
+
+const gotTheLock = app.requestSingleInstanceLock();
+if (!gotTheLock) {
+  app.quit();
+} else {
+  app.on('second-instance', () => {
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
+    }
+  });
+}
 
 
 
@@ -133,6 +123,7 @@ function createWindow() {
     }
   }
   mainWindow.once('ready-to-show', () => {
+
 
     ipcMain.on('toggle-auto-sync', (event, status, syncedFoldersJSON) => {
       if (status) {
@@ -237,6 +228,11 @@ function createWindow() {
 
 app.whenReady().then(() => {
   ipcMain.handle('ping', () => 'pong');
+  app.setLoginItemSettings({
+    openAtLogin: true,
+    openAsHidden: true, 
+    restoreState: false,
+  });
   createWindow();
 
   app.on('second-instance', (event, commandLine, workingDirectory) => {
@@ -374,26 +370,21 @@ app.on('before-quit', async () => {
   
 function startNotificationProcess() {
   const { spawn } = require('child_process');
-  const nodePath = process.execPath;
+  const nodePath = process.execPath; // Get the Node.js executable path
+  const notificationScript = path.join(__dirname, 'notification.js'); // Path to the script
   const pidFilePath = path.join(__dirname, 'notification.pid');
 
   try {
-    const notificationProcess = spawn(nodePath, ['notification.js'], {
-      detached: true,
-      stdio: ['ignore', 'ignore', 'ignore'],
+    // Spawn the notification process
+    const notificationProcess = spawn(nodePath, [notificationScript], {
+      detached: true, // Ensure it runs separately
+      stdio: 'ignore', // No console output
     });
 
-    notificationProcess.unref();
+    notificationProcess.unref(); // Allow the parent process to exit independently
 
     notificationProcess.on('error', (error) => {
       console.error(`Error starting notification process: ${error.message}`);
-    });
-
-    notificationProcess.on('exit', (code) => {
-      console.log(`Notification process exited with code ${code}`);
-      if (fs.existsSync(pidFilePath)) {
-        fs.unlinkSync(pidFilePath);
-      }
     });
 
     notificationProcess.on('spawn', () => {
@@ -408,8 +399,7 @@ function startNotificationProcess() {
     console.error(`Failed to spawn notification process: ${spawnError.message}`);
   }
 }
-
-  startNotificationProcess();
+  // startNotificationProcess();
 });
 
 

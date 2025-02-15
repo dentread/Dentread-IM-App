@@ -523,14 +523,14 @@ logButton.addEventListener('click', async () => {
 const logoutButton = document.getElementById('logoutbutton');
 logoutButton.addEventListener('click', () => {
     window.location.href = 'login_dentread.html';
-    // const itemKey = 'savedPassword';
+    const itemKey = 'savedPassword';
   
-    // if (localStorage.getItem(itemKey)) {
-    //     localStorage.removeItem(itemKey);
-    //     console.log('Authentication token has been removed.');
-    // } else {
-    //     console.log('No authentication token found.');
-    // }
+    if (localStorage.getItem(itemKey)) {
+        localStorage.removeItem(itemKey);
+        console.log('Authentication token has been removed.');
+    } else {
+        console.log('No authentication token found.');
+    }
 });
 
 const func5 = async () => {
