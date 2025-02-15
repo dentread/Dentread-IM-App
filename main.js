@@ -10,34 +10,36 @@ const AutoLaunch = require('auto-launch');
 const myAppAutoLauncher = new AutoLaunch({
   name: 'DentIMApp',
   path: process.execPath,
-  isHidden: true, 
+  isHidden: true,
+  mac: {
+    useLaunchAgent: true
+  }
 });
+
+myAppAutoLauncher.isEnabled().then((isEnabled) => {
+  if (!isEnabled) {
+    console.log('AutoLaunch is disabled. Not enabling automatically.');
+  }
+}).catch((err) => {
+  console.error('Error checking auto-launch status:', err);
+});
+
+
 
 app.on('ready', () => {
 
   stopNotificationProcess();
-  const isAutoLaunch = app.getLoginItemSettings().wasOpenedAtLogin;
-  if (isAutoLaunch) {
-    mainWindow.once('ready-to-show', () => {
-      mainWindow.minimize();
-    });
+
+
+
   }
-  myAppAutoLauncher.isEnabled().then((isEnabled) => {
-    if (!isEnabled) {
-      myAppAutoLauncher.enable().catch((err) => {
-        console.error('Failed to enable auto-launch:', err);
-      });
-    }
-  }).catch((err) => {
-    console.error('Auto-launch setup failed:', err);
-  });
-});
+);
 
 
 let tray;
 
 
-let isUpdateInProgress = false;
+// let isUpdateInProgress = false;
 
 
 
@@ -51,46 +53,6 @@ const pidFilePath = './notificationProcess.pid';
 
 let notificationProcess = null;
 
-
-
-
-app.on('ready', () => {
-  autoUpdater.checkForUpdates();
-
-  autoUpdater.on('update-available', () => {
-    isUpdateInProgress = true;
-    autoUpdater.downloadUpdate();
-
-    autoUpdater.on('update-downloaded', () => {
-      console.log('Update downloaded. Ready to install.');
-      app.removeAllListeners('before-quit');
-      autoUpdater.quitAndInstall();
-    });
-  });
-
-  autoUpdater.on('checking-for-update', () => {
-    console.log('Checking for update...');
-  });
-
-  autoUpdater.on('update-not-available', () => {
-    console.log('Update not available.');
-  });
-
-  autoUpdater.on('error', (err) => {
-    console.error('Error in auto-updater:', err);
-  });
-
-  autoUpdater.on('download-progress', (progressObj) => {
-    console.log(`Download speed: ${progressObj.bytesPerSecond}`);
-    console.log(`Downloaded ${progressObj.percent}%`);
-  });
-
-  tray = new Tray(path.join(__dirname, 'images/LogoDentread.png'));
-
-
-
-
-});
 
 
 
@@ -171,7 +133,6 @@ function createWindow() {
     }
   }
   mainWindow.once('ready-to-show', () => {
-    autoUpdater.checkForUpdatesAndNotify();
 
     ipcMain.on('toggle-auto-sync', (event, status, syncedFoldersJSON) => {
       if (status) {
@@ -233,9 +194,9 @@ function createWindow() {
 
 
   mainWindow.on('close', async(event) => {
-    if (isUpdateInProgress) {
-      return;
-    }
+    // if (isUpdateInProgress) {
+    //   return;
+    // }
     const choice = require('electron').dialog.showMessageBoxSync(mainWindow, {
       type: 'question',
       buttons: ['Yes', 'No'],
@@ -245,13 +206,15 @@ function createWindow() {
       
     })
 
+    if (!mainWindow || mainWindow.isDestroyed()) {
+      console.log("Main window is already destroyed. Skipping close operations.");
+      return;
+    }
+
 
     if (choice === 0) {
       try {
-        console.log('Disabling auto-launch...');
-        myAppAutoLauncher.disable().catch((err) => {
-          console.error('Failed to disable auto-launch:', err);
-        });
+
   
         console.log('Deleting directory...');
         await mainWindow.webContents.executeJavaScript(`window.versions.deleteDirectory()`);
@@ -267,7 +230,7 @@ function createWindow() {
   })
 
   
-  // mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
 
 }
 
@@ -275,6 +238,13 @@ function createWindow() {
 app.whenReady().then(() => {
   ipcMain.handle('ping', () => 'pong');
   createWindow();
+
+  app.on('second-instance', (event, commandLine, workingDirectory) => {
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
+    }
+  });
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
@@ -492,19 +462,3 @@ ipcMain.handle('open-reload-manual', () => {
   return true;
 
 });
-
-// app.on('window-all-closed', () => {
-//   const projectPath = './';
-//   const directoryPath = path.join(projectPath, 'Dentread');
-
-//   if (fs.existsSync(directoryPath)) {
-//     rimraf.sync(directoryPath);
-//     console.log(`Directory deleted: ${directoryPath}`);
-//   } else {
-//     console.log('Directory does not exist');
-//   }
-
-//   if (process.platform !== 'darwin') {
-//     app.quit();
-//   }
-// });

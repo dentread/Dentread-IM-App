@@ -1,16 +1,11 @@
 {
   "name": "DentreadIMApp",
-  "version": "1.4.3",
+  "version": "1.5.1",
   "description": "Dentread IM App",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
     "package": "electron-builder"
-  },
-  "repository": "https://github.com/dentread/Dentread-IM-App",
-  "publish": {
-    "provider": "github",
-    "releaseType": "release"
   },
   "nsis": {
     "oneClick": true,
@@ -18,7 +13,8 @@
     "allowToChangeInstallationDirectory": true,
     "allowElevation": true,
     "forceCloseApplications": true,
-    "deleteAppDataOnUninstall": true
+    "deleteAppDataOnUninstall": true,
+    "runAfterFinish": false
   },
   "build": {
     "appId": "com.dentread.Imapp",

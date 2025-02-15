@@ -354,11 +354,31 @@ contextBridge.exposeInMainWorld('versions', {
 
   schedulerbuttonfunc: async () => {
     const os = require('os');
-    const hostname = os.hostname();
-
-    localStorage.setItem('hostname', hostname);
 
     ipcRenderer.invoke('open-scheduler');
+},
+
+getmacidhostname:async () => {
+  const os = require('os');
+  const hostname = os.hostname();
+
+  localStorage.setItem('hostname', hostname);
+
+  const networkInterfaces = os.networkInterfaces();
+
+let macAddress;
+for (const interfaceName in networkInterfaces) {
+  const interfaces = networkInterfaces[interfaceName];
+  for (const iface of interfaces) {
+    if (!iface.internal && iface.mac !== '00:00:00:00:00:00') {
+      macAddress = iface.mac;
+      break;
+    }
+  }
+  if (macAddress) break;
+}
+localStorage.setItem('macAddress', macAddress);
+
 },
 
 

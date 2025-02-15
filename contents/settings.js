@@ -228,6 +228,7 @@ function storeDeviceDetails(deviceUID, deviceName){
     window.location.href = 'login_dentread.html';
   } else {
     const appLiscence = localStorage.getItem('appLiscence');
+    const mac_host = localStorage.getItem('macAddress') + '_' + localStorage.getItem('hostname');
     const apiUrl = 'https://api.dentread.com/store-device-info/';
     fetch(apiUrl, {
         method: 'POST',
@@ -238,7 +239,9 @@ function storeDeviceDetails(deviceUID, deviceName){
         body: JSON.stringify({
           deviceUID: deviceUID,
           deviceName: deviceName,
-          appLiscence: appLiscence
+          appLiscence: appLiscence,
+          mac_host:mac_host
+          
         }), 
     })
     .then(response => {

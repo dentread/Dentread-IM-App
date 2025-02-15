@@ -21,8 +21,6 @@ win:
 
   publisherName: "Dentread"
   artifactName: "${productName}-Setup-${version}.${ext}"
-  squirrelWindows:
-    remoteReleases: https://github.com/dentreadbhavik/Dentread-IM-App # Replace with your GitHub repository URL
 mac:
   target: dmg
 linux:
