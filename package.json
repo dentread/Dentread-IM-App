@@ -1,6 +1,6 @@
 {
   "name": "DentreadIMApp",
-  "version": "1.5.1",
+  "version": "2.0.0.1",
   "description": "Dentread IM App",
   "main": "main.js",
   "scripts": {
@@ -9,26 +9,24 @@
     "preuninstall": "node uninstaller.js",
     "uninstall": "node uninstaller.js"
   },
-  "nsis": {
-    "oneClick": true,
-    "perMachine": true,
-    "allowToChangeInstallationDirectory": true,
-    "allowElevation": true,
-    "forceCloseApplications": true,
-    "deleteAppDataOnUninstall": true,
-    "createDesktopShortcut": true,
-    "createStartMenuShortcut": true,
-    "requireAdminPrivileges": true,
-    "runAfterFinish": false,
-    "include": "uninstaller.nsh"
-  },
   "build": {
     "appId": "com.dentread.Imapp",
+    "productName": "DentreadIMApp",
+    "directories": {
+      "output": "DentreadBuild11"
+    },
     "win": {
       "target": "nsis"
     },
-    "directories": {
-      "output": "DentreadBuild11"
+    "nsis": {
+      "oneClick": true,
+      "perMachine": true,
+      "allowElevation": true,
+      "deleteAppDataOnUninstall": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "runAfterFinish": true,
+      "include": "uninstaller.nsh"
     },
     "artifactName": "${productName}-Setup.${ext}",
     "files": [
@@ -44,7 +42,6 @@
     "asar": true,
     "icon": "images/LogoDentread.png"
   },
-  "productName": "DentreadIMApp",
   "author": "Dentread",
   "license": "ISC",
   "dependencies": {

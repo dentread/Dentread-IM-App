@@ -367,6 +367,19 @@ ipcMain.on('logError', (event, error) => {
 });
 
 app.on('before-quit', async () => {
+
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.close();
+  }
+  if (customDialog && !customDialog.isDestroyed()) {
+      customDialog.close();
+  }
+  if (customlog && !customlog.isDestroyed()) {
+      customlog.close();
+  }
+  if (customSchedule && !customSchedule.isDestroyed()) {
+      customSchedule.close();
+  }
   
 function startNotificationProcess() {
   const { spawn } = require('child_process');

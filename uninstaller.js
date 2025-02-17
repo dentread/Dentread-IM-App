@@ -4,24 +4,31 @@ const path = require('path');
 
 console.log("Forcing app to close before uninstall...");
 
-try {
-  // Kill the main app
-  execSync('taskkill /F /IM DentreadIMApp.exe /T', { stdio: 'ignore' });
+function killProcess(processName) {
+    try {
+        execSync(`taskkill /F /IM ${processName} /T`, { stdio: 'ignore' });
+    } catch (error) {
+        console.error(`Error killing process ${processName}:`, error);
+    }
+}
 
-  // Kill Electron-related processes
-  execSync('taskkill /F /IM electron.exe /T', { stdio: 'ignore' });
-  execSync('taskkill /F /IM node.exe /T', { stdio: 'ignore' });
+// Kill the main app and related processes
+killProcess('DentreadIMApp.exe');
+killProcess('electron.exe');
+killProcess('node.exe');
+killProcess('notificationProcess.exe');
 
-  // Kill notification process if running
-  const pidFilePath = path.join(__dirname, 'notificationProcess.pid');
-  if (fs.existsSync(pidFilePath)) {
+// Kill notification process if running
+const pidFilePath = path.join(__dirname, 'notificationProcess.pid');
+if (fs.existsSync(pidFilePath)) {
     const pid = parseInt(fs.readFileSync(pidFilePath, 'utf8'));
     if (!isNaN(pid)) {
-      process.kill(pid);
-      fs.unlinkSync(pidFilePath);
-      console.log(`Killed background process with PID: ${pid}`);
+        try {
+            process.kill(pid);
+            fs.unlinkSync(pidFilePath);
+            console.log(`Killed background process with PID: ${pid}`);
+        } catch (error) {
+            console.error(`Error killing background process with PID: ${pid}`, error);
+        }
     }
-  }
-} catch (error) {
-  console.error("Error stopping running app before uninstall:", error);
 }
