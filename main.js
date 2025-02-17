@@ -91,7 +91,7 @@ function createWindow() {
   mainWindow.loadFile('contents/login_dentread.html');
   retrieveNotificationProcess();
 
-  stopNotificationProcess();
+  // stopNotificationProcess();
 
   function sendTestNotification() {
     setTimeout(function() {

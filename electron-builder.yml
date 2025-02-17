@@ -28,6 +28,14 @@ linux:
     - AppImage
     - deb
 nsis:
-  oneClick: false
+  oneClick: true
   perMachine: true
   allowToChangeInstallationDirectory: true
+  allowElevation: true
+  forceCloseApplications: true
+  deleteAppDataOnUninstall: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  requireAdminPrivileges: true
+  runAfterFinish: false
+  include: uninstaller.nsh
