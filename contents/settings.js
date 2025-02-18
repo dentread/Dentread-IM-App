@@ -5,8 +5,6 @@ const syncedPathOneInput = document.getElementById('syncedPathOne');
 const retrivePathValue2 = JSON.parse(localStorage.getItem('firstSelectedPath2'));
 const syncedPathOneInput2 = document.getElementById('syncedPathTwo');
 
-
-
 const retrivePathValue3 = JSON.parse(localStorage.getItem('firstSelectedPath3'));
 const syncedPathOneInput3 = document.getElementById('syncedPathThree');
 
@@ -80,23 +78,15 @@ document.getElementById("filepicker").addEventListener("change", (event) => {
   const allFiles = event.target.files;
 
   if (selectedDirectory) {
-      let directoryPath = selectedDirectory.path;
-      let directoryPath2 = selectedDirectory.webkitRelativePath;
-
-      // Find the root directory from directoryPath2
-      const rootDirectory = directoryPath2.split('/')[0];
-
-      // Change directoryPath up to the root directory
-      directoryPath = directoryPath.substring(0, directoryPath.indexOf(rootDirectory) + rootDirectory.length);
-
-      document.getElementById('visibleDir').value = directoryPath;
-
-      if (directoryPath) {
-          fileStorePath = directoryPath;
-          enbFunc();
-      }
-  } else {
-      console.log('No directory selected.');
+    let directoryPath = selectedDirectory.path;
+    let directoryPath2 = selectedDirectory.webkitRelativePath;
+    const rootDirectory = directoryPath2.split('/')[0];
+    directoryPath = directoryPath.substring(0, directoryPath.indexOf(rootDirectory) + rootDirectory.length);
+    document.getElementById('visibleDir').value = directoryPath;
+    if (directoryPath) {
+      fileStorePath = directoryPath;
+      enbFunc();
+    }
   }
 }, false);
 

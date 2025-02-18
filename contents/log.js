@@ -47,11 +47,16 @@ function downloadLog() {
     downloadLink.click();
     document.body.removeChild(downloadLink);
 }
-document.getElementById('downloadLink').removeEventListener('click', downloadLog);
-document.getElementById('downloadLink').addEventListener('click', downloadLog);
+const downloadlogButton = document.getElementById('downloadlog');
+if(downloadlogButton) {
+    downloadlogButton.addEventListener('click', downloadLog);
+}
 
 // Call fetchData function when the page is loaded
-document.getElementById('refreshlog').addEventListener('click', fetchlogData);
+const refreshlogButton = document.getElementById('refreshlog');
+if(refreshlogButton) {
+    refreshlogButton.addEventListener('click', fetchlogData);
+}
 function fetchlogData() {
     const token = JSON.parse(localStorage.getItem('token'));
     let acces_token = token.access;
@@ -80,7 +85,6 @@ function fetchlogData() {
         .then(data => {
             fetchedData = data || { folders: {} }; // Assign fetched data to global variable or an empty object if no data is returned
             const tableBody = document.getElementById('logContainer');
-
             // Clear existing table contents
             tableBody.innerHTML = '';
 

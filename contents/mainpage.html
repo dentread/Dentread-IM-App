@@ -50,9 +50,9 @@
                     <h6><b>Linked Device:</b> <span id="linkedDeviceInfo"></span></h6>
                 </div>
                 <div class="col-md-6 logout-header">
-                    <button class="btn settings-button dentread-button ml-auto" id="log"><i class="fas fa-info-circle"></i> Logs</button>
-                    <button class="btn settings-button dentread-button ml-auto" id="settingsButton"><i class="fa fa-cog" aria-hidden="true"></i> Settings</button>
-                    <button class="btn logout-button ml-auto" id="logoutbutton"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                    <button class="btn info-button dentread-button ml-auto animated-button" id="log"><i class="fas fa-info-circle"></i> Info</button>
+                    <button class="btn settings-button dentread-button ml-auto animated-button" id="settingsButton"><i class="fa fa-cog" aria-hidden="true"></i> Settings</button>
+                    <button class="btn logout-button ml-auto animated-button" id="logoutbutton"><i class="fas fa-sign-out-alt"></i> Logout</button>
                 </div>
             </div>
             <div class="col-sm-12 col-lg-12 col-xl-12 mb-5">
@@ -83,8 +83,8 @@
                     <h6 class="m-0"><b>Data Sync</b></h6>
                 </div>
                 <div class="upload-status-body col-md-6 text-end">
-                    <button class="btn dentread-button ml-auto" id="manualSyncBtn">Manual Sync</button>
-                    <button class="btn dentread-button ml-auto" id="scheduleSyncBtn">Schedule Sync</button>
+                    <button class="btn dentread-button ml-auto animated-button" id="manualSyncBtn"><i class="fas fa-user mr-2"></i>Manual Sync</button>
+                    <button class="btn dentread-button ml-auto animated-button" id="scheduleSyncBtn"><i class="fas fa-calendar-check mr-2"></i>Schedule Sync</button>
                 </div>
                 <div class="upload-progress-bar col-md-12 pt-3">
                     <div class="progress">
@@ -108,7 +108,7 @@
                         <div class="staged">
                             <div class="heading-part">
                                 <h6>Files ready to be synced</h6>
-                                <button type="button" class="btn dentread-button ml-auto" id="stageToSync"><i class="fa fa-refresh" aria-hidden="true"></i></button>
+                                <button type="button" class="btn dentread-button ml-auto animated-button" id="stageToSync"><i class="fas fa-sync-alt"></i></button>
                             </div>
                             <div class="container text-area custom-scrollbar mt-2" id="allStagedFiles">
                             </div>
@@ -118,7 +118,7 @@
                         <div class="dentreadstage">
                             <div class="heading-part extra-padding">
                                 <h6>Syncing to Dentread</h6>
-                                <button type="button" class="d-none" disabled="true"><i class="fa fa-refresh custom-margin" aria-hidden="true"></i>Ok</button>
+                                <button type="button" class="d-none animated-button" disabled="true"><i class="fa fa-refresh custom-margin" aria-hidden="true"></i>Ok</button>
                             </div>
                             <div class="container text-area custom-scrollbar mt-2" id="allStagedFilesdentread">
                             </div>
@@ -138,6 +138,22 @@
         </div>
     </div>
     <script>
+        document.getElementById("stageToSync").addEventListener("click", function () {
+            changeIconTemporarily(this, "fas fa-sync-alt fa-spin", 5000);
+        });
+        document.getElementById("syncToDentreadId").addEventListener("click", function () {
+            changeIconTemporarily(this, "fas fa-spinner fa-spin", 5000);
+        });
+        
+        function changeIconTemporarily(button, newIcon, duration) {
+            let icon = button.querySelector("i");
+            let originalIcon = icon.className;
+            icon.className = newIcon;
+            setTimeout(() => {
+                icon.className = originalIcon;
+            }, 5000);
+        }        
+
         document.addEventListener('DOMContentLoaded', function() {
             const alertBox = document.getElementById('alert-box');
             const alertContainer = document.getElementById('alertContainer');
@@ -231,10 +247,8 @@
 
     if (dictionary && typeof dictionary === 'object') {
         if (hostname in dictionary) {
-            console.log(dictionary[hostname])
             return dictionary[hostname];
         } else {
-           
             return null;
         }
     } else {
@@ -246,9 +260,6 @@
         const currentTime = new Date();
         const storedHour = parseInt(storedTime.split(':')[0], 10);
         const storedMinute = parseInt(storedTime.split(':')[1], 10);
-
-        console.log('currentTime',currentTime.getHours(),currentTime.getMinutes(), storedHour, storedMinute)
-
         return currentTime.getHours() === storedHour && currentTime.getMinutes() === storedMinute;
     }
 
@@ -309,7 +320,6 @@ function runLogic() {
     }
 });
 async function stopCheckingMatchTime() {
-    console.log("Stopping synchronization after 60 min.");
     await window.versions.manualbuttonfunc();
 }
     const manualSyncBtn = document.getElementById('manualSyncBtn');

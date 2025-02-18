@@ -108,11 +108,8 @@ const pushUniqueContents = async (allContents, folderNamesSet, filenamesSet, pat
     const twentyFourHoursAgo = new Date().getTime() - timeslotValue;
 
     contents.forEach(item => {
-        // Check if the item is not already present in localStorage
-        console.log(item ,"item.createdTimestamp ")
         if (!folderNamesSet.has(item.name) && !filenamesSet.has(item.name)&& item.createdTimestamp >= twentyFourHoursAgo) {
             allContents.push(item);
-            // Add the item to the appropriate set based on its type (folder or file)
             if (item.isDirectory) {
                 folderNamesSet.add(item.name);
             } else {
@@ -165,58 +162,6 @@ const viewTargetedFolder = async () => {
     });
     container.appendChild(ul);
 };
-// const viewTargetedFolder = async () => {
-//     const container = document.getElementById('allStagedFiles');
-//     const storedPaths = new Set(); // Store paths from local storage
-//     const folderNamesSet = new Set(JSON.parse(localStorage.getItem('folderNames')) || []);
-//     const filenamesSet = new Set(JSON.parse(localStorage.getItem('filenames')) || []);
-//     const allContents = [];
-
-//     // Add paths from local storage to the set
-//     for (let i = 1; i <= 3; i++) {
-//         const key = `firstSelectedPath${i}`;
-//         const pathData = JSON.parse(localStorage.getItem(key));
-//         if (pathData && pathData[key]) {
-//             storedPaths.add(pathData[key]);
-//         }
-//     }
-
-//     // Function to retrieve contents and add to allContents if not stored
-//     const retrieveContents = async (path) => {
-//         if (!storedPaths.has(path)) {
-//             const contents = await listDirectoryContents(path);
-//             allContents.push(...contents);
-//         }
-//     };
-
-//     // Retrieve contents for each selected path if not stored
-//     for (let i = 1; i <= 3; i++) {
-//         const key = `firstSelectedPath${i}`;
-//         const pathData = JSON.parse(localStorage.getItem(key));
-//         if (pathData && pathData[key]) {
-//             await retrieveContents(pathData[key]);
-//         }
-//     }
-//     console.log(allContents,"allContents")
-//     console.log(storedPaths,"storedPaths")
-
-
-//     if (allContents.length === 0) {
-//         container.innerText = 'No files or folders found.';
-//         return;
-//     }
-
-//     container.innerHTML = '';
-//     const ul = document.createElement('ul');
-//     ul.className = 'custom-list';
-//     allContents.forEach((item, index) => {
-//         const li = document.createElement('li');
-//         li.textContent = `${item.name.length > 25 ? item.name.substring(0, 25) + '...' : item.name}`;
-//         ul.appendChild(li);
-//     });
-//     container.appendChild(ul);
-// };
-
 
 const listDirectoryContents = async (directoryPath) => {
     const response = await window.versions.listFilesAndFolders(directoryPath);
@@ -341,12 +286,8 @@ const viewTargetedFolderdentraed = async () => {
     const PrefSyncOption = localStorage.getItem('prefSyncOption');
     if (PrefSyncOption === 'scheduleSync') {
         document.getElementById('stageToSync').click();
-        console.log("Initial button click completed");
-
-        // Delay the click on the other button by 30 seconds
         setTimeout(() => {
             document.getElementById('syncToDentreadId').click();
-            console.log("Second button clicked after 30 seconds");
         }, 30000);
     }
 
@@ -359,12 +300,6 @@ function handleTheUploadedContentCount() {
     const allStagedFiles = document.getElementById('allStagedFilesdentread');
     const liElements = allStagedFiles.querySelectorAll('li');
     const totalFileCount = liElements.length;
-    
-    
-    
-    // const totalFileCount = localStorage.getItem('progresscount');
-    // console.log(totalFileCount,"totalFileCount", uploadedFileNumber,"uploadedFileNumber" )
-
     if (totalFileCount !== uploadedFileNumber && totalFileCount > uploadedFileNumber) {
         uploadedFileNumber += 1;
         document.getElementById('totalUploadedFile').innerText = uploadedFileNumber;
@@ -384,11 +319,9 @@ function handleTheUploadedContentCount() {
 
 const syncButtondentreadstage = document.getElementById('syncToDentreadId');
 syncButtondentreadstage.addEventListener('click', () => {
-if (!func2Running) {
-    viewTargetedFolderdentraed();
-} else {
-    console.log('func2 is still running. wait for sync');
-}
+    if (!func2Running) {
+        viewTargetedFolderdentraed();
+    }
 });
 
 const func3 = async (reqdId, loaderDiv) => {
@@ -429,7 +362,6 @@ const func3 = async (reqdId, loaderDiv) => {
                 loaderDiv.replaceWith(timeoutImage);
                 
             } else if (response) {
-                console.log('Response Uploaded: ', response);
                 const successImage = document.createElement('img');
                 successImage.src = '../images/tick-check.png';
                 successImage.alt = 'Success';
@@ -438,7 +370,6 @@ const func3 = async (reqdId, loaderDiv) => {
                 successImage.style.marginLeft = '20px';
                 loaderDiv.replaceWith(successImage);
                 if (reqdId !== null) {
-                    console.log(reqdId,"reqdId1")
                     await func7(reqdId);
                     await fetchData();
                     await func6();
@@ -493,12 +424,8 @@ document.addEventListener('DOMContentLoaded', async() => {
     await timeslot();
     const storedPrefSyncOption = localStorage.getItem('prefSyncOption');
     if(storedPrefSyncOption && storedPrefSyncOption === 'scheduleSync'){
-        // document.getElementById('headermessage').textContent = 'Autosync is running...';
-        // document.getElementById('headermessage').style.color = 'green';
         await window.versions.minimizeWindow();
     }else{
-        // document.getElementById('headermessage').textContent = 'Autosync Disabled';
-        // document.getElementById('headermessage').style.color = 'red';
         await window.versions.minimizeWindow2();
     }
 });
@@ -506,13 +433,9 @@ document.addEventListener('DOMContentLoaded', async() => {
 
 const manualButton = document.getElementById('manualSyncBtn');
 manualButton.addEventListener('click', async () => {
-    // document.getElementById('headermessage').textContent = 'Autosync Disabled';
-    // document.getElementById('headermessage').style.color = 'red';
     localStorage.setItem('prefSyncOption', 'manualSync');
     await window.versions.manualbuttonfunc();
-
     await window.versions.minimizeWindow2();
-
 });
 
 
@@ -527,9 +450,6 @@ logoutButton.addEventListener('click', () => {
   
     if (localStorage.getItem(itemKey)) {
         localStorage.removeItem(itemKey);
-        console.log('Authentication token has been removed.');
-    } else {
-        console.log('No authentication token found.');
     }
 });
 
@@ -554,8 +474,6 @@ const func6 = async () => {
     } else {
         console.error('Synced folders array not found in local storage.');
     }
-
-    // Return a resolved promise
     return Promise.resolve();
 };
 
@@ -606,27 +524,6 @@ function fetchData() {
         });
     }
 };
-
-
-// Define the captureConsoleLogs function first
-// const captureConsoleLogs = async () => {
-//     console.log("func called")
-//     const logs = [];
-//     const oldConsoleLog = console.log;
-//     console.log("oldConsoleLog",logs)
-//     console.log = function (message) {
-//         logs.push(message);
-//         oldConsoleLog.apply(console, arguments);
-//     };
-//     if (logs.length > 0) {
-//         const response = await window.versions.sendLogsToMain(logs);
-//         // Do something with the response here if needed
-//         console.log("Response from server:", response);
-//     }
-// }
-
-// // Attach the event listener after defining the function
-// document.getElementById('downloadLinkclient').addEventListener('click', captureConsoleLogs);
 
 function Scheduleevent() {
     const token = JSON.parse(localStorage.getItem('token'));

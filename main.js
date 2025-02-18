@@ -21,14 +21,7 @@ app.on('ready', () => {
 
 
 let tray;
-
-
-// let isUpdateInProgress = false;
-
-// console.log(app.getLoginItemSettings());
-
 const pidFilePath = './notificationProcess.pid';
-
 let notificationProcess = null;
 
 const gotTheLock = app.requestSingleInstanceLock();
@@ -149,7 +142,6 @@ function createWindow() {
   
           function updateNotification() {
               const syncedFoldersArray = JSON.parse(syncedFoldersJSON);
-              console.log(syncedFoldersArray, "syncedFoldersArray");
   
               if (Array.isArray(syncedFoldersArray)) {
                   const totalCount = syncedFoldersArray.length;
@@ -198,19 +190,13 @@ function createWindow() {
     })
 
     if (!mainWindow || mainWindow.isDestroyed()) {
-      console.log("Main window is already destroyed. Skipping close operations.");
       return;
     }
 
 
     if (choice === 0) {
       try {
-
-  
-        console.log('Deleting directory...');
         await mainWindow.webContents.executeJavaScript(`window.versions.deleteDirectory()`);
-  
-        console.log('Exiting application...');
         app.quit();
       } catch (error) {
         console.error('Error during close operation:', error);
@@ -338,6 +324,7 @@ function createcustomlog() {
   customlog.on('closed', () => {
     customlog = null;
   });
+  customlog.webContents.openDevTools();
   
 }
 
@@ -390,7 +377,6 @@ function startNotificationProcess() {
     notificationProcess.on('spawn', () => {
       try {
         fs.writeFileSync(pidFilePath, notificationProcess.pid.toString(), { mode: 0o644 });
-        console.log(`Notification process started with PID: ${notificationProcess.pid}`);
       } catch (fsError) {
         console.error(`Error writing PID file: ${fsError.message}`);
       }

@@ -4,62 +4,162 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Dentread IM App - logs</title>
+    <title>Dentread IM App - Info</title>
     <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="../assets/settings.css">
     <link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.css">
     <link rel="stylesheet" href="../assets/mainpage.css">
+    <style>
+        /* Add your styles here */
+        p {
+            margin: 0;
+            font-size: small;
+        }
+        .mr-2{
+            margin-right: 0.5rem;
+        }
+        /*.status-running { 
+            color: green; 
+            font-weight: bold;
+        }
+        .status-stopped { 
+            color: red; 
+            font-weight: bold;
+        }*/
+        .card-title{
+            color: #0076CC;
+        }
+    </style>
   </head>
   <body>
     <div class="container-fluid mt-2">
-        <div class="log-action-section d-flex justify-content-between align-items-center">
-            <a href="#" id="refreshlog" class="dentread-button p-2"><i class="fas fa-redo-alt"></i> Refresh Logs</a>
-            <a href="#" id="downloadLink" download="log.txt" class="dentread-button p-2"><i class="fas fa-download"></i> Download Logs</a>
+        <!-- IM App Information -->
+        <div class="card my-3">
+            <div class="card-body">
+                <h6 class="card-title"><i class="fab fa-python mr-2"></i>App Information</h6>
+                <p><strong>Version:</strong> <span id="appVersion">v2.0.0.1</span></p>
+                <p><strong>Serial Number:</strong> <span id="app-id"></span></p>
+                <p><strong>Host Name:</strong> <span id="host-name"></span></p>
+                <p><strong>Mac Id:</strong> <span id="host-mac"></span></p>
+            </div>
         </div>
-        <div class="container-fluid mt-2">
-            <!-- Log table -->
-            <table class="table table-bordered">
-                <thead>
-
-                </thead>
-                <tbody id="logContainer">
-                </tbody>
-            </table>
+        <!-- Device Details -->
+        <div class="card my-3">
+            <div class="card-body">
+                <h6 class="card-title"><i class="fas fa-desktop mr-2"></i>Device Details</h6>
+                <p><strong>Device Name:</strong> <span id="deviceName"></span></p>
+                <p><strong>Device Model:</strong> <span id="model"></span></p>
+                <p><strong>Manufacturer:</strong> <span id="brandName"></span></p>
+                <p><strong>Serial Number:</strong> <span id="serial-no"></span></p>
+            </div>
         </div>
-    
-
+        <!-- IM App Details -->
+        <div class="card my-3">
+            <div class="card-body">
+                <h6 class="card-title"><i class="fas fa-sync-alt mr-2"></i>Sync Details</h6>
+                <p><strong>Sync Type:</strong> <span id="sync-type"></span></p>
+                <p><strong>Status:</strong> <span id="status" class="status-running">Running</span></p>
+                <p><strong>Last Sync:</strong> <span id="last-run"></span></p>
+            </div>
+        </div>
     </div>
     <script src="../node_modules/jquery/dist/jquery.min.js"></script>
     <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../contents/log.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
-<style>.primary-button {
-    display: inline-block;
-    padding: 10px 20px;
-    background-color: #007bff; /* Primary color */
-    color: #fff; /* Text color */
-    text-decoration: none; /* Remove underline */
-    border-radius: 5px; /* Rounded corners */
-    transition: background-color 0.3s ease;
-}
+    <script>
+        //fet call to get the device details & update the state
+        function getDeviceDetails() {
+            const deviceNameEl = document.getElementById("deviceName");
+            const brandEl = document.getElementById("brandName");
+            const modelEl = document.getElementById("model");
+            const serialNoEl = document.getElementById("serial-no");
+            const linkedDeviceId = localStorage.getItem("linkedDevice");
+            let lastRunEl = document.getElementById("last-run");
+            const apiCallUrl = `https://api.dentread.com/connected-device-details?deviceUID=${linkedDeviceId}`;
+            const token = JSON.parse(localStorage.getItem('token'));
+            const acces_token = token.access;
+            fetch(apiCallUrl, {
+                method: 'GET',
+                headers: {
+                'Authorization': `Bearer ${acces_token}`, 
+                'Content-Type': 'application/json', 
+                } 
+            })
+            // validate the response
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response;
+            })
+            //parse the response
+            .then(response => response.json())
+            .then(data => {
+                console.log(data.lastSyncTime);
+                lastRunEl.innerText = data.lastSyncTime ? `${data.lastSyncTime}` : "Unknown";
+                //first check if the data is empty
+                deviceNameEl.innerText = data.deviceName ? data.deviceName : "N/A";
+                brandEl.innerText = data.brand ? data.brand : "Unknown";
+                modelEl.innerText = data.model  ? data.model : "Unknown";
+                serialNoEl.innerText = data.serialNo ? data.serialNo : "Unknown";
+            });
+        };
 
-.primary-button:hover {
-    background-color: #0056b3; /* Darker shade of primary color on hover */
-}
-    /* Remove underline */
-    #refreshlog {
-        text-decoration: none;
-    }
+        function formatTimeStamp(syncTime){
+            const time = syncTime.split(":");
+            let hours = time[0];
+            let minutes = time[1];
+            let ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            minutes = minutes < 10 ? '0'+minutes : minutes;
+            const strTime = hours + ':' + minutes + ' ' + ampm;
+            return strTime;
+        }
 
-    /* Remove color */
-    #refreshlog {
-        color: inherit;
-    }
+        document.addEventListener("DOMContentLoaded", function() {
+            //get the app id from the local storage
+            const appIdEl = document.getElementById("app-id");
+            const appId = localStorage.getItem("appLiscence");
+            appIdEl.innerText = appId;
 
-    /* Optionally, you can specify a specific color */
-    #refreshlog {
-        color: black; /* Change "black" to the desired color */
-    }
-</style>
+            //get the host name from the local storage
+            let hostNameEl = document.getElementById("host-name");
+            const hostName = localStorage.getItem("hostname");
+            hostNameEl.innerText = hostName;
+
+            //get the host mac from the local storage
+            let hostMacEl = document.getElementById("host-mac");
+            const hostMac = localStorage.getItem("macAddress");
+            hostMacEl.innerText = hostMac;
+
+            // populate the device details by using the fetch API
+            getDeviceDetails();
+
+            //get the sync type from the local storage
+            let syncTypeEl = document.getElementById("sync-type");
+            const syncType = localStorage.getItem("prefSyncOption");
+            const scheduleSyncType = localStorage.getItem('prefRadioValue');
+            const hostTime = localStorage.getItem("hostname_time");
+
+            //get the syncTime from the hostTime this is an string of a dictionary {"hostName": "08:30:00"}
+            const syncTime = hostTime ? JSON.parse(hostTime)[hostName] : "06:00:00";
+
+            // 24 hour time format
+            const strTime = formatTimeStamp(syncTime);
+            const scheduleSyncName = (scheduleSyncType && scheduleSyncType === "perpetualSchedule") ? "(Perpetual | Every 5 min)" : `(Custom | ${strTime})`;
+            const syncTypeName = (syncType === "manualSync") ? "Manual Sync" : `Scheduled ${scheduleSyncName ? scheduleSyncName : ""}`;
+            syncTypeEl.innerText = syncTypeName;
+            
+            let statusEl = document.getElementById("status");
+            syncType === "manualSync" ? statusEl.innerText = "Idle" : statusEl.innerText = "Running";
+            if (statusEl.innerText === "Running") {
+                statusEl.classList.add("status-running");
+            } else {
+                statusEl.classList.add("status-stopped");
+            }
+        });
+        
+    </script>
   </body>
 </html>

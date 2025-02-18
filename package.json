@@ -1,6 +1,6 @@
 {
   "name": "DentreadIMApp",
-  "version": "1.5.1",
+  "version": "2.0.0.1",
   "description": "Dentread IM App",
   "main": "main.js",
   "scripts": {

@@ -144,11 +144,11 @@
         </div>
         <div class="col-sm-12 store-schedule text-end mt-4">
           <button
-            class="btn dentread-button active-button-identify"
+            class="btn dentread-button active-button-identify animated-button"
             type="button"
             id="storeSchedulePref"
           >
-            Save
+          <i class="fas fa-save mr-2"></i>Save
           </button>
         </div>
       </div>
@@ -349,7 +349,6 @@
               body: formData,
             })
               .then((response) => {
-                console.log("Response Status:", response.status);
                 const hostname = localStorage.getItem("hostname");
 
                 const data = {

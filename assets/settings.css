@@ -134,3 +134,19 @@ footer{
 .warn-color{
     color: red;
 }
+
+.mr-2{
+    margin-right: 0.5rem;
+}
+.animated-button:hover i {
+    animation: zoomInOut 0.6s ease-in-out forwards;
+}
+
+@keyframes zoomInOut {
+    0% {
+        transform: scale(1);
+    }
+    100% {
+        transform: scale(1.2);
+    }
+}

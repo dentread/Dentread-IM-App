@@ -122,11 +122,9 @@ contextBridge.exposeInMainWorld('versions', {
   
       if (fs.existsSync(directoryPath)) {
         if (localStorageValue==='manualSync'){
-        rimraf.sync(directoryPath);
-        }
-        else
-        {
-            console.log("no manual sync found")
+          rimraf.sync(directoryPath);
+        }else{
+          console.log("no manual sync found")
         }
         return { success: true, message: `Directory deleted: ${directoryPath}` };
       } else {
@@ -147,8 +145,6 @@ contextBridge.exposeInMainWorld('versions', {
       const usernameDirectoryPath = path.join(dentreadDirectoryPath, username);
       const sanitizedDirectoryName = directoryName.trim(); // Remove leading and trailing spaces
       const targetPath = path.join(usernameDirectoryPath, sanitizedDirectoryName);
-      console.log(targetPath,"targetPath")
-  
       if (fs.existsSync(targetPath)) {
         if (fs.lstatSync(targetPath).isDirectory()) {
           const directoryContents = fs.readdirSync(targetPath);
@@ -160,20 +156,13 @@ contextBridge.exposeInMainWorld('versions', {
               rimraf.sync(itemPath);
             } else {
               fs.unlinkSync(itemPath);
-              console.log(`Error deleting ${itemPath}: ${unlinkError.message}`);
-
             }
           }
           
           fs.rmdirSync(targetPath);
-
-          console.log(`At [${currentTimelocal}] : Sync completed for: ${targetPath}`);
-          
           return { success: true, message: `Directory emptied: ${targetPath}` };
         } else if (fs.lstatSync(targetPath).isFile()) {
           fs.unlinkSync(targetPath);
-          
-          console.log(`At [${currentTimelocal}] : Sync completed for: ${targetPath}`);
           return { success: true, message: `File removed: ${targetPath}` };
         } else {
           return { success: false, message: 'Invalid target: Neither a file nor a directory' };
@@ -208,14 +197,10 @@ contextBridge.exposeInMainWorld('versions', {
         function processNextItem() {
           if (totalCopied >= 5) return;
           if (items.length === 0) return;
-  
           const item = items.shift();
           const sourceItemPath = path.join(sourceDirectory, item);
           const destinationItemPath = path.join(destinationDirectory, item);
-
           const creationTime = fs.statSync(sourceItemPath).birthtime.getTime();
-          console.log(creationTime,"creationTime")
-          console.log(twentyFourHoursAgo,"twentyFourHoursAgo")
     
           if (fs.statSync(sourceItemPath).isDirectory()) {
             const folderNamesSet = new Set(JSON.parse(localStorage.getItem('folderNames')));
@@ -228,10 +213,6 @@ contextBridge.exposeInMainWorld('versions', {
                 });
                 output.on('close', () => {
                   totalCopied++;
-                  console.log(`At [${currentTime}] Copied file: ${sourceItemPath} to ${destinationItemPath}`);
-
-                 
-
                   processNextItem();
                 });
                 archive.pipe(output);
@@ -250,8 +231,6 @@ contextBridge.exposeInMainWorld('versions', {
               if (!filenameSet.has(item)&& creationTime >= twentyFourHoursAgo) {
                 fs.copyFileSync(sourceItemPath, destinationItemPath);
                 totalCopied++;
-                console.log(`At [${currentTime}] Copied folder: ${sourceItemPath} to ${destinationItemPath}`);
-               
               } else {
               }
             } else {

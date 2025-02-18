@@ -22,7 +22,6 @@ function fetchData() {
         })
         .then(response => {
             if (response.ok) {
-                console.log('API request successful');
                 return response.json(); 
             } else {
 

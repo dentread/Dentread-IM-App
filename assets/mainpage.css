@@ -24,8 +24,23 @@ body::-webkit-scrollbar-thumb:hover {
   border: 0.5px solid var(--Red, #de0000);
 }
 
-.settings-button {
+.settings-button, .info-button {
   margin-right: 5px;
+}
+.mr-2{
+  margin-right: 0.5rem;
+}
+.animated-button:hover i {
+  animation: zoomInOut 0.6s ease-in-out forwards;
+}
+
+@keyframes zoomInOut {
+  0% {
+      transform: scale(1);
+  }
+  100% {
+      transform: scale(1.2);
+  }
 }
 
 .logout-header {
@@ -271,13 +286,18 @@ body::-webkit-scrollbar-thumb:hover {
   color: #1f3f7f;
 }
 .dentread-button:hover {
-  color: inherit;
+  color: #1f3f7f;
   background-color: transparent;
   border-color: #1f3f7f;
 }
 .dentread-button:active {
   background-color: #f4f9f466 !important;
   border-color: #d4d0d0 !important;
+}
+.dentread-button:focus-visible {
+  color: #1f3f7f;
+  background-color: transparent;
+  border-color: #1f3f7f;
 }
 .auto-sync-action{
   border-bottom: 0.5px solid #e4d0d0;

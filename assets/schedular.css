@@ -70,8 +70,23 @@ body::-webkit-scrollbar-thumb:hover {
 .active-button-identify{
     color: white;
     background-color: #0076CC;
-  }
-  .active-button-identify:hover {
+}
+.active-button-identify:hover {
     color: white !important;
     background-color: #0076CC !important;
-  }
+}
+.mr-2{
+    margin-right: 0.5rem;
+}
+.animated-button:hover i {
+    animation: zoomInOut 0.6s ease-in-out forwards;
+}
+
+@keyframes zoomInOut {
+    0% {
+        transform: scale(1);
+    }
+    100% {
+        transform: scale(1.2);
+    }
+}

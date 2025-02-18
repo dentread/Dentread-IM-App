@@ -4,7 +4,6 @@ const { exec } = require('child_process');
 function isProcessRunning(processName) {
     try {
       const result = exec(`tasklist /FI "IMAGENAME eq ${processName}.exe"`, { encoding: 'utf-8' });
-      console.log('Tasklist result:', result); 
       return result.includes(processName);
     } catch (error) {
       console.error('Error executing tasklist:', error); 
