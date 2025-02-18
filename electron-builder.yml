@@ -28,6 +28,4 @@ linux:
     - AppImage
     - deb
 nsis:
-  oneClick: false
-  perMachine: true
-  allowToChangeInstallationDirectory: true
+  oneClick: true
