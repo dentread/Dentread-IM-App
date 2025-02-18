@@ -74,7 +74,7 @@
             const modelEl = document.getElementById("model");
             const serialNoEl = document.getElementById("serial-no");
             const linkedDeviceId = localStorage.getItem("linkedDevice");
-            let lastRunEl = document.getElementById("last-run");
+            const lastRunEl = document.getElementById("last-run");
             const apiCallUrl = `https://api.dentread.com/connected-device-details?deviceUID=${linkedDeviceId}`;
             const token = JSON.parse(localStorage.getItem('token'));
             const acces_token = token.access;
@@ -95,8 +95,8 @@
             //parse the response
             .then(response => response.json())
             .then(data => {
-                console.log(data.lastSyncTime);
                 lastRunEl.innerText = data.lastSyncTime ? `${data.lastSyncTime}` : "Unknown";
+                
                 //first check if the data is empty
                 deviceNameEl.innerText = data.deviceName ? data.deviceName : "N/A";
                 brandEl.innerText = data.brand ? data.brand : "Unknown";
