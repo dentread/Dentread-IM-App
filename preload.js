@@ -238,59 +238,42 @@ contextBridge.exposeInMainWorld('versions', {
             processNextItem();
           }
         }
-    
         processNextItem();
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    },
-    
-  
-
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  },
 
   listFilesAndFolders: async (directoryPath)=> {
     try {
       const items = await fs.promises.readdir(directoryPath);
       const statsPromises = items.map(item => fs.promises.stat(path.join(directoryPath, item)));
-
       const stats = await Promise.all(statsPromises);
-
       return items.map((item, index) => ({
-          name: item,
-          isDirectory: stats[index].isDirectory(),
-          createdTimestamp: stats[index].birthtimeMs
-      }));
-  } catch (error) {
+        name: item,
+        isDirectory: stats[index].isDirectory(),
+        createdTimestamp: stats[index].birthtimeMs
+    }));
+    } catch (error) {
       console.error('Error listing files and folders:', error);
       return [];
-  }
+    }
   },
-
-
   hitApiWithFolderPathAndSubdirectories: async (reqdId) => {
     try {
-
       let currentTime = new Date().toLocaleString();
-
       const savedUsername = localStorage.getItem('savedUsername');
       const currentWorkingDirectory = process.cwd();
-  
       const newDirectoryPath = currentWorkingDirectory + '\\' + 'Dentread' + '\\' + savedUsername + '\\' + reqdId;
       const apiUrl = 'https://api.dentread.com/datasync/';
       const token = JSON.parse(localStorage.getItem('token'));
       const accessToken = token.access;
       const username = localStorage.getItem('savedUsername');
-  
       const isDirectory = fs.statSync(newDirectoryPath).isDirectory();
-  
       let zipFilePath = '';
-  
       if (isDirectory) {
         zipFilePath = await createZipFromDirectory(newDirectoryPath);
-  
         const response = await sendFileToAPI(zipFilePath, apiUrl, accessToken, username);
-  
-  
         if (zipFilePath) {
           try {
             await fs.promises.unlink(zipFilePath);
@@ -298,7 +281,6 @@ contextBridge.exposeInMainWorld('versions', {
             console.error('Error deleting zip file:', err);
           }
         }
-  
         if (response) {
           return response;
         } else {
@@ -321,75 +303,59 @@ contextBridge.exposeInMainWorld('versions', {
   },
   settingsbuttonfunc: async () => {
     ipcRenderer.invoke('open-settings')
-    },
-    logButtonfunc: async () => {
-      ipcRenderer.invoke('open-logs')
-      },
+  },
+  logButtonfunc: async () => {
+    ipcRenderer.invoke('open-logs')
+  },
 
-    minimizeWindow: async () => {
-      const syncedFoldersJSON = localStorage.getItem('folderNames');
-      ipcRenderer.send('toggle-auto-sync', true, syncedFoldersJSON); 
+  minimizeWindow: async () => {
+    const syncedFoldersJSON = localStorage.getItem('folderNames');
+    ipcRenderer.send('toggle-auto-sync', true, syncedFoldersJSON); 
   },
 
   schedulerbuttonfunc: async () => {
     const os = require('os');
-
     ipcRenderer.invoke('open-scheduler');
-},
+  },
 
-getmacidhostname:async () => {
-  const os = require('os');
-  const hostname = os.hostname();
-
-  localStorage.setItem('hostname', hostname);
-
-  const networkInterfaces = os.networkInterfaces();
-
-let macAddress;
-for (const interfaceName in networkInterfaces) {
-  const interfaces = networkInterfaces[interfaceName];
-  for (const iface of interfaces) {
-    if (!iface.internal && iface.mac !== '00:00:00:00:00:00') {
-      macAddress = iface.mac;
-      break;
+  getmacidhostname:async () => {
+    const os = require('os');
+    const hostname = os.hostname();
+    localStorage.setItem('hostname', hostname);
+    const networkInterfaces = os.networkInterfaces();
+    let macAddress;
+    for (const interfaceName in networkInterfaces) {
+      const interfaces = networkInterfaces[interfaceName];
+      for (const iface of interfaces) {
+        if (!iface.internal && iface.mac !== '00:00:00:00:00:00') {
+          macAddress = iface.mac;
+          break;
+        }
+      }
+      if (macAddress) break;
     }
-  }
-  if (macAddress) break;
-}
-localStorage.setItem('macAddress', macAddress);
-
-},
-
-
-manualbuttonfunc: async () => {
-  ipcRenderer.invoke('open-reload-manual');
-},
-minimizeWindow2: async () => {
-  function sendTestNotification() {
-    const localStorageValue = localStorage.getItem('prefSyncOption');
-    if (localStorageValue === 'manualSync') {
-      notifier.notify({
-        title: 'Dentread IM App Auto Sync Notification',
-        message: 'This is to notify that auto sync is off',
-        sound: true,
-        wait: true,
-        icon: path.join(__dirname, 'images/LogoDentread.png'),
-      });
+    localStorage.setItem('macAddress', macAddress);
+  },
+  manualbuttonfunc: async () => {
+    ipcRenderer.invoke('open-reload-manual');
+  },
+  minimizeWindow2: async () => {
+    function sendTestNotification() {
+      const localStorageValue = localStorage.getItem('prefSyncOption');
+      if (localStorageValue === 'manualSync') {
+        notifier.notify({
+          title: 'Dentread IM App Auto Sync Notification',
+          message: 'This is to notify that auto sync is off',
+          sound: true,
+          wait: true,
+          icon: path.join(__dirname, 'images/LogoDentread.png'),
+        });
+      }
     }
-  }
-
-  // Initial call to check and send notification
-  setTimeout(sendTestNotification, 2 * 60 * 1000);
-
-  // Repeat notification every hour
-  const intervalId = setInterval(sendTestNotification, 60 * 60 * 1000);
-
-  // Send message to the main process to toggle auto-sync off
-  ipcRenderer.send('toggle-auto-sync', false);
-},
-
-
-  
+    setTimeout(sendTestNotification, 2 * 60 * 1000);
+    const intervalId = setInterval(sendTestNotification, 60 * 60 * 1000);
+    ipcRenderer.send('toggle-auto-sync', false);
+  },
 });
 
 
