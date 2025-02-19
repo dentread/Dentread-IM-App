@@ -95,13 +95,13 @@
             //parse the response
             .then(response => response.json())
             .then(data => {
-                lastRunEl.innerText = data.lastSyncTime ? `${data.lastSyncTime}` : "Unknown";
-                
+                lastRunEl.innerText = data.lastSyncTime ? `${data.lastSyncTime}` : "";
+
                 //first check if the data is empty
-                deviceNameEl.innerText = data.deviceName ? data.deviceName : "N/A";
-                brandEl.innerText = data.brand ? data.brand : "Unknown";
-                modelEl.innerText = data.model  ? data.model : "Unknown";
-                serialNoEl.innerText = data.serialNo ? data.serialNo : "Unknown";
+                deviceNameEl.innerText = data.deviceName ? data.deviceName : "Not Linked";
+                brandEl.innerText = data.brand ? data.brand : "Not Linked";
+                modelEl.innerText = data.model  ? data.model : "Not Linked";
+                serialNoEl.innerText = data.serialNo ? data.serialNo : "Not Linked";
             });
         };
 
@@ -151,8 +151,9 @@
             const syncTypeName = (syncType === "manualSync") ? "Manual Sync" : `Scheduled ${scheduleSyncName ? scheduleSyncName : ""}`;
             syncTypeEl.innerText = syncTypeName;
             
-            let statusEl = document.getElementById("status");
-            syncType === "manualSync" ? statusEl.innerText = "Idle" : statusEl.innerText = "Running";
+            const statusEl = document.getElementById("status");
+            const appStatus = localStorage.getItem("appStatus");
+            statusEl.innerText = appStatus ? appStatus : "Idle";
             if (statusEl.innerText === "Running") {
                 statusEl.classList.add("status-running");
             } else {

@@ -60,25 +60,22 @@ loginForm.addEventListener('submit', async (event) => {
                 const token = xhr.response.token;
                 const user_name = xhr.response.name;
                 const orgname = xhr.response.orgname;
+                const appLiscence = xhr.response.appLiscenceNumber;
                 const func = async () => {
                     const response = await window.versions.createDirectory(username);
                     if (response.success) {
                         const dentread_dir = response.directoryPath; 
-                        
-    
                         return dentread_dir; 
                     } else {
                         console.error('Directory creation failed:', response.message);
                         return null;
                     }
                 };
-    
                 const dentread_dir = func();
-
                 localStorage.setItem('token', JSON.stringify(token));
                 localStorage.setItem('user_name', user_name)
                 localStorage.setItem('orgname', orgname)
-
+                localStorage.setItem('appLiscence', appLiscence)
                 if (rememberMe) {
                     localStorage.setItem('rememberMe', true);
                     localStorage.setItem('savedUsername', username);
@@ -105,9 +102,7 @@ loginForm.addEventListener('submit', async (event) => {
     xhr.onerror = function () {
         console.error('API request error:', xhr.statusText);
     };
-
     const formData = `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}&linkedDevice=${encodeURIComponent(linkedDevice)}&appLiscence=${encodeURIComponent(appLiscence)}`;
-
     xhr.send(formData);
 });
 

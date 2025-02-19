@@ -261,6 +261,7 @@ contextBridge.exposeInMainWorld('versions', {
   },
   hitApiWithFolderPathAndSubdirectories: async (reqdId) => {
     try {
+      localStorage.setItem('appStatus', 'Running');
       let currentTime = new Date().toLocaleString();
       const savedUsername = localStorage.getItem('savedUsername');
       const currentWorkingDirectory = process.cwd();
@@ -288,8 +289,6 @@ contextBridge.exposeInMainWorld('versions', {
         }
       } else {
         const response = await sendFileToAPI(newDirectoryPath, apiUrl, accessToken, username);
-  
-  
         if (response) {
           return response;
         } else {
@@ -299,6 +298,8 @@ contextBridge.exposeInMainWorld('versions', {
     } catch (error) {
       console.error('API Error:', error);
       return { message: 'API request failed', status: 500 }; 
+    }finally {
+      localStorage.setItem('appStatus', 'Idle');
     }
   },
   settingsbuttonfunc: async () => {
