@@ -23,10 +23,6 @@ body::-webkit-scrollbar-thumb:hover {
 .logout-button:hover {
   border: 0.5px solid var(--Red, #de0000);
 }
-
-.settings-button, .info-button {
-  margin-right: 5px;
-}
 .mr-2{
   margin-right: 0.5rem;
 }
@@ -46,11 +42,9 @@ body::-webkit-scrollbar-thumb:hover {
 .logout-header {
   display: flex;
   justify-content: end;
-  padding: 5px 5px;
-  border-radius: 7px;
-  margin-bottom: 5px;
-  color: var(--Red, #de0000);
-  background: none;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
 }
 
 .enclosing-card img {
@@ -69,14 +63,11 @@ body::-webkit-scrollbar-thumb:hover {
   margin-bottom: 0 !important;
 }
 .other-info {
-  margin-left: auto;
   display: flex;
   align-items: center;
 }
 
 .other-info > div {
-  padding: 0 1.5rem;
-  /* border-right: 1px solid #bdbdcd; */
   text-align: center;
 }
 .other-info > div:last-child {
@@ -317,4 +308,15 @@ body::-webkit-scrollbar-thumb:hover {
 
 #downloadLink{
   text-decoration: none;
+}
+.upload-status-body{
+  gap: 5px;
+}
+.upload-progress-bar {
+  width: inherit;
+}
+.main-intro{
+  border: 2px solid #e5e5eb;
+  border-radius: 5px;
+  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.1);
 }

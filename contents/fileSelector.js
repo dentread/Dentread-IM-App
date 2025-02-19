@@ -8,7 +8,7 @@ const truncateString = (str, maxLength) => {
     return str;
 };
 
-const truncatedUserName = truncateString(userNameValue, 10);
+const truncatedUserName = truncateString(userNameValue, 15);
 const truncatedOrgName = truncateString(orgNameValue, 40);
 
 const userNameElements = document.getElementsByClassName('user-name');
