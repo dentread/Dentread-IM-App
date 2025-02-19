@@ -91,9 +91,8 @@ contextBridge.exposeInMainWorld('versions', {
   
   createDirectory: (username) => {
     try {
-      const projectPath = './';
 
-      const directoryPath = path.join(projectPath, 'Dentread', username);
+      const directoryPath = path.join(process.env.APPDATA || process.env.HOME, 'Dentread', username);
 
 
       if (!fs.existsSync(directoryPath)) {
@@ -141,8 +140,7 @@ contextBridge.exposeInMainWorld('versions', {
 
       const projectPath = './';
       const username = localStorage.getItem('savedUsername');
-      const dentreadDirectoryPath = path.join(projectPath, 'Dentread');
-      const usernameDirectoryPath = path.join(dentreadDirectoryPath, username);
+      const usernameDirectoryPath = localStorage.getItem('dentread_dir');
       const sanitizedDirectoryName = directoryName.trim(); // Remove leading and trailing spaces
       const targetPath = path.join(usernameDirectoryPath, sanitizedDirectoryName);
       if (fs.existsSync(targetPath)) {
@@ -263,8 +261,8 @@ contextBridge.exposeInMainWorld('versions', {
     try {
       let currentTime = new Date().toLocaleString();
       const savedUsername = localStorage.getItem('savedUsername');
-      const currentWorkingDirectory = process.cwd();
-      const newDirectoryPath = currentWorkingDirectory + '\\' + 'Dentread' + '\\' + savedUsername + '\\' + reqdId;
+      const currentWorkingDirectory = localStorage.getItem('dentread_dir');
+      const newDirectoryPath = currentWorkingDirectory + '\\' + reqdId;
       const apiUrl = 'https://api.dentread.com/datasync/';
       const token = JSON.parse(localStorage.getItem('token'));
       const accessToken = token.access;
