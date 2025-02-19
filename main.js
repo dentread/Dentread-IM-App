@@ -207,7 +207,7 @@ function createWindow() {
   })
 
   
-  mainWindow.webContents.openDevTools();
+  // mainWindow.webContents.openDevTools();
 
 }
 
@@ -324,7 +324,7 @@ function createcustomlog() {
   customlog.on('closed', () => {
     customlog = null;
   });
-  customlog.webContents.openDevTools();
+  // customlog.webContents.openDevTools();
   
 }
 
