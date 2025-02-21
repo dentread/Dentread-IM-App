@@ -176,71 +176,81 @@ contextBridge.exposeInMainWorld('versions', {
 
   copyFilesWithCondition: function namedFunction(sourceDirectory, destinationDirectory, fileExtensions) {
     try {
-      if (!fs.existsSync(destinationDirectory)) {
-          fs.mkdirSync(destinationDirectory, { recursive: true });
+        if (!fs.existsSync(destinationDirectory)) {
+            fs.mkdirSync(destinationDirectory, { recursive: true });
         }
+        
         let currentTime = new Date().toLocaleString();
-
         let currentonlytime = new Date().getTime();
         const timeslot = localStorage.getItem('timeslot');
         const defaultTimeslot = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
-    
         const timeslotValue = timeslot ? parseInt(timeslot, 10) : defaultTimeslot;
         const twentyFourHoursAgo = currentonlytime - timeslotValue;
 
-
         const items = fs.readdirSync(sourceDirectory);
+        console.log(items,"items")
+        console.log("destinationDirectory",destinationDirectory)
+        console.log("sourceDirectory",sourceDirectory)
         let totalCopied = 0;
-    
+
         function processNextItem() {
-          if (totalCopied >= 5) return;
-          if (items.length === 0) return;
-          const item = items.shift();
-          const sourceItemPath = path.join(sourceDirectory, item);
-          const destinationItemPath = path.join(destinationDirectory, item);
-          const creationTime = fs.statSync(sourceItemPath).birthtime.getTime();
-    
-          if (fs.statSync(sourceItemPath).isDirectory()) {
-            const folderNamesSet = new Set(JSON.parse(localStorage.getItem('folderNames')));
-            if (!folderNamesSet.has(item)) {
-              if (!item.endsWith('.zip')&& creationTime >= twentyFourHoursAgo) {
-                const zipFileName = item + '.zip';
-                const output = fs.createWriteStream(path.join(destinationDirectory, zipFileName));
-                const archive = archiver('zip', {
-                  zlib: { level: 9 }
-                });
-                output.on('close', () => {
-                  totalCopied++;
-                  processNextItem();
-                });
-                archive.pipe(output);
-                archive.directory(sourceItemPath, false);
-                archive.finalize();
-              } else {
+            if (totalCopied >= 5) return;
+            if (items.length === 0) return;
+
+            const item = items.shift();
+            const sourceItemPath = path.join(sourceDirectory, item);
+            console.log("sourceItemPath",sourceItemPath)
+            const destinationItemPath = path.join(destinationDirectory, item);
+            console.log("destinationItemPath",destinationItemPath)
+            const creationTime = fs.statSync(sourceItemPath).birthtime.getTime();
+
+            if (fs.statSync(sourceItemPath).isDirectory()) {
+                const folderNamesSet = new Set(JSON.parse(localStorage.getItem('folderNames')) || []);
+                
+                if (!folderNamesSet.has(item)) {
+                    const zipFileName = item + '.zip';
+                    const zipFilePath = path.join(destinationDirectory, zipFileName);
+                    
+                    if (!fs.existsSync(zipFilePath) && !item.endsWith('.zip') && creationTime >= twentyFourHoursAgo) {
+                        const output = fs.createWriteStream(zipFilePath);
+                        const archive = archiver('zip', { zlib: { level: 9 } });
+
+                        output.on('close', () => {
+                            totalCopied++;
+                            processNextItem();
+                        });
+
+                        archive.pipe(output);
+                        archive.directory(sourceItemPath, false);
+                        archive.finalize();
+                    } else {
+                        processNextItem();
+                    }
+                } else {
+                    processNextItem();
+                }
+            } else {
+                const fileExtension = path.extname(item).toLowerCase();
+                if (fileExtensions.includes(fileExtension)) {
+                    const filenameSet = new Set(JSON.parse(localStorage.getItem('filenames')) || []);
+
+                    if (!filenameSet.has(item) && !fs.existsSync(destinationItemPath) && creationTime >= twentyFourHoursAgo) {
+                        fs.copyFileSync(sourceItemPath, destinationItemPath);
+                        filenameSet.add(item);
+                        localStorage.setItem('filenames', JSON.stringify([...filenameSet]));
+                        totalCopied++;
+                    }
+                }
                 processNextItem();
-              }
-            } else {
-              processNextItem();
             }
-          } else {
-            const fileExtension = path.extname(item).toLowerCase();
-            if (fileExtensions.includes(fileExtension)) {
-              const filenameSet = new Set(JSON.parse(localStorage.getItem('filenames')));
-              if (!filenameSet.has(item)&& creationTime >= twentyFourHoursAgo) {
-                fs.copyFileSync(sourceItemPath, destinationItemPath);
-                totalCopied++;
-              } else {
-              }
-            } else {
-            }
-            processNextItem();
-          }
         }
+
         processNextItem();
     } catch (error) {
-      console.error("Error:", error);
+        console.error("Error:", error);
     }
-  },
+},
+
 
   listFilesAndFolders: async (directoryPath)=> {
     try {
