@@ -6,8 +6,10 @@ const notifier = require('node-notifier');
 const cron = require('node-cron');
 const { exec } = require('child_process');
 
+const { autoUpdater,AppUpdater } = require("electron-updater");
+autoUpdater.autoDownload = false;
 
-autoUpdater.autoDownload = false; // Prevent auto download, allow user prompt
+
 
 // Check for updates when the app is ready
 app.on('ready', () => {
