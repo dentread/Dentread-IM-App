@@ -7,6 +7,37 @@ const cron = require('node-cron');
 const { exec } = require('child_process');
 
 
+autoUpdater.autoDownload = false; // Prevent auto download, allow user prompt
+
+// Check for updates when the app is ready
+app.on('ready', () => {
+    autoUpdater.checkForUpdates();
+});
+
+// Notify user when update is available
+autoUpdater.on('update-available', (info) => {
+    dialog.showMessageBox({
+        type: 'info',
+        title: 'Update Available',
+        message: 'A new version is available. Do you want to download it now?',
+        buttons: ['Yes', 'No']
+    }).then(result => {
+        if (result.response === 0) { // 'Yes' button
+            autoUpdater.downloadUpdate();
+        }
+    });
+});
+
+autoUpdater.on('update-downloaded', () => {
+    dialog.showMessageBox({
+        type: 'info',
+        title: 'Update Ready',
+        message: 'Update downloaded. The application will restart now to install the update.',
+        buttons: ['Restart']
+    }).then(() => {
+        autoUpdater.quitAndInstall();
+    });
+});
 
 
 app.on('ready', () => {
